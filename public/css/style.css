@@ -31,22 +31,22 @@ img { max-width: 100%; display: block; }
   border-bottom: 1px solid var(--c-border);
 }
 .nav-inner {
-  max-width: 960px; margin: 0 auto; padding: 0.9rem 1.5rem;
+  max-width: 960px; margin: 0 auto; padding: 0.4rem 1.5rem;
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo { text-decoration: none; display: flex; align-items: center; }
 .nav-logo-img { height: 36px; width: auto; display: block; }
 .nav-links { display: flex; gap: 1.5rem; list-style: none; }
 .nav-links a {
-  text-decoration: none; color: var(--c-muted);
-  font-size: 0.9rem; font-weight: 500; transition: color 0.15s;
+  text-decoration: none; color: #334155;
+  font-size: 0.9rem; font-weight: 600; transition: color 0.15s;
 }
 .nav-links a:hover { color: var(--c-primary); }
 
 /* ── Hero ───────────────────────────────────────────── */
 .hero {
   background: var(--gradient-hero);
-  padding: 5rem 1.5rem 4rem;
+  padding: 2.5rem 1.5rem 1.75rem;
   text-align: center; color: #fff;
   position: relative; overflow: hidden;
 }
@@ -70,10 +70,38 @@ img { max-width: 100%; display: block; }
   font-weight: 800; line-height: 1.1; margin-bottom: 1rem;
   text-shadow: 0 2px 16px rgba(0,0,0,0.2);
 }
-.hero-sub {
-  font-size: 1.05rem; opacity: 0.85; margin-bottom: 2.5rem;
-  max-width: 480px; margin-left: auto; margin-right: auto;
+/* ── Hero top layout (title group + prompt chips) ─── */
+.hero-top { margin-bottom: 1.25rem; }
+.hero-prompts { display: none; }
+
+.hero--chatting .hero-top {
+  display: flex; flex-direction: row; align-items: flex-start;
+  justify-content: center; gap: 1.5rem; text-align: left;
+  max-width: 680px; margin: 0 auto 1rem;
 }
+.hero--chatting .hero-title-group { flex: 0 0 190px; text-align: left; }
+.hero--chatting .hero-title-group h1 { font-size: clamp(1rem, 2.5vw, 1.5rem); margin-bottom: 0.3rem; }
+.hero--chatting .hero-title-group .hero-sub { font-size: 0.75rem; margin-bottom: 0; opacity: 0.8; }
+.hero--chatting .hero-prompts {
+  display: flex; flex-direction: column; gap: 0.45rem; flex: 1; min-width: 0;
+}
+
+.hero-sub {
+  font-size: 1rem; opacity: 0.85; margin-bottom: 1.5rem;
+  max-width: 500px; margin-left: auto; margin-right: auto;
+}
+
+/* ── Prompt chips ───────────────────────────────────── */
+.prompt-chip {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.92); font-size: 0.78rem; font-weight: 500;
+  padding: 0.45rem 0.75rem; border-radius: 8px;
+  cursor: pointer; text-align: left; font-family: var(--font);
+  transition: background 0.15s; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.prompt-chip:hover { background: rgba(255,255,255,0.22); }
 
 /* ── Chat Widget ────────────────────────────────────── */
 .chat-widget {
@@ -106,23 +134,41 @@ img { max-width: 100%; display: block; }
   background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);
   align-self: flex-start; font-style: italic; font-size: 0.82rem;
 }
-.chat-input-row { display: flex; gap: 0.5rem; }
+.chat-input-row { display: flex; gap: 0.4rem; align-items: center; }
 .chat-input-row input {
-  flex: 1; padding: 0.75rem 1rem; border-radius: 8px;
+  flex: 1; padding: 0.65rem 0.9rem; border-radius: 8px;
   border: none; font-size: 0.95rem; outline: none;
   background: rgba(255,255,255,0.95); color: var(--c-text);
   font-family: var(--font);
 }
 .chat-input-row input::placeholder { color: var(--c-muted); }
-.chat-input-row button {
-  padding: 0.75rem 1.25rem; border-radius: 8px; border: none;
-  background: #fff; color: var(--c-primary);
-  font-weight: 700; font-size: 0.9rem; cursor: pointer;
-  transition: background 0.15s; white-space: nowrap;
-  font-family: var(--font);
+
+/* Square send icon button — greyed until text entered */
+.chat-send-btn {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 8px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.4);
+  transition: background 0.15s, color 0.15s;
 }
-.chat-input-row button:hover { background: #e8f0fe; }
-.chat-input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-send-btn:not(:disabled) {
+  background: #fff; color: var(--c-primary);
+}
+.chat-send-btn:not(:disabled):hover { background: #e8f0fe; }
+.chat-send-btn:disabled { cursor: default; }
+
+/* Attach button */
+.chat-attach-btn {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 6px;
+  color: rgba(255,255,255,0.6); transition: color 0.15s;
+}
+.chat-attach-btn:hover { color: rgba(255,255,255,0.9); }
+.chat-attach-name {
+  font-size: 0.7rem; color: rgba(255,255,255,0.8);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;
+}
 
 /* Light chat variant — semi-opaque white on coloured hero backgrounds */
 .chat-widget--light {
@@ -150,19 +196,21 @@ img { max-width: 100%; display: block; }
 .chat-widget--dark .chat-input-row input {
   background: rgba(30,41,59,0.9); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.1);
 }
-.chat-widget--dark .chat-input-row button {
+.chat-widget--dark .chat-send-btn:not(:disabled) {
   background: var(--c-primary); color: #fff;
 }
-.chat-widget--dark .chat-input-row button:hover { background: #1e40af; }
+.chat-widget--dark .chat-send-btn:not(:disabled):hover { background: #1e40af; }
+.chat-widget--dark .chat-attach-btn { color: #64748b; }
+.chat-widget--dark .chat-attach-btn:hover { color: #94a3b8; }
 
 /* ── Service Cards ──────────────────────────────────── */
 .services {
-  padding: 4.5rem 1.5rem;
+  padding: 2rem 1.5rem;
   background: var(--c-surface);
 }
 .services-title {
-  text-align: center; font-size: 1.75rem; font-weight: 800;
-  margin-bottom: 2.5rem;
+  text-align: center; font-size: 1.5rem; font-weight: 800;
+  margin-bottom: 1.5rem;
 }
 .services-sub {
   text-align: center; color: var(--c-muted);
@@ -175,7 +223,7 @@ img { max-width: 100%; display: block; }
 }
 .card {
   background: var(--c-surface); border: 1px solid var(--c-border);
-  border-radius: var(--radius); padding: 1.75rem;
+  border-radius: var(--radius); padding: 1.25rem;
   box-shadow: var(--shadow); cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
   text-decoration: none; color: inherit; display: block;
@@ -187,7 +235,7 @@ img { max-width: 100%; display: block; }
 
 /* ── Card Illustrations ──────────────────────────────── */
 .card-illustration {
-  height: 90px; margin-bottom: 1.25rem;
+  height: 72px; margin-bottom: 1rem;
   display: flex; align-items: center; gap: 1rem;
   position: relative; overflow: hidden;
 }

@@ -25,9 +25,18 @@
 </nav>
 
 <!-- Hero + Chatbot -->
-<section class="hero">
-  <h1>What do you need<br>help with?</h1>
-  <p class="hero-sub">Ask about data automation, energy upgrades, or gadgets and tools — or request a free quote to see how we can save you money and time.</p>
+<section class="hero" id="hero-section">
+  <div class="hero-top">
+    <div class="hero-title-group">
+      <h1>What do you need<br>help with?</h1>
+      <p class="hero-sub">Ask about data automation, energy upgrades, or gadgets — or request a free quote to see how we can save you money and time.</p>
+    </div>
+    <div class="hero-prompts" id="hero-prompts">
+      <button class="prompt-chip" data-prompt="Why would an SMSF make sense for me as a tradie running a Pty Ltd? What are the tax benefits of that structure?">💼 SMSF for tradies — tax benefits?</button>
+      <button class="prompt-chip" data-prompt="How much does a data platform cost for a business with 20 people and 3 main databases around 100GB?">📊 Data platform cost for 20 people?</button>
+      <button class="prompt-chip" data-prompt="Based on a typical floorplan and a reverse cycle system from a leading brand, what are the rough costs including installation?">❄️ Reverse cycle costs for my home?</button>
+    </div>
+  </div>
   <div class="chat-widget" id="homepage-chat"></div>
 </section>
 
@@ -132,8 +141,17 @@
 
 <script src="/js/chat.js"></script>
 <script>
-  new ChatWidget('homepage-chat', '/api/chat', {
+  var homeChat = new ChatWidget('homepage-chat', '/api/chat', {
     placeholder: 'Ask about data automation, energy upgrades, gadgets and tools…'
+  });
+
+  // Prompt chip clicks — fill input and send immediately
+  document.querySelectorAll('.prompt-chip').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      homeChat._input().value = this.dataset.prompt;
+      homeChat._syncBtn();
+      homeChat.send();
+    });
   });
 
   // Testimonials carousel
