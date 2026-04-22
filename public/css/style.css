@@ -32,12 +32,8 @@ img { max-width: 100%; display: block; }
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--c-border);
 }
-.nav-logo {
-  font-weight: 800; font-size: 1.2rem;
-  color: var(--c-primary); letter-spacing: -0.5px;
-  text-decoration: none;
-}
-.nav-logo span { color: var(--c-accent); }
+.nav-logo { text-decoration: none; display: flex; align-items: center; }
+.nav-logo-img { height: 36px; width: auto; display: block; }
 .nav-links { display: flex; gap: 1.5rem; list-style: none; }
 .nav-links a {
   text-decoration: none; color: var(--c-muted);
