@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnwindAI — Data, AI & Energy Upgrades</title>
+  <meta name="description" content="AI-powered data automation, free VEU energy upgrades for Victorian homeowners, and free tools built by a data engineer.">
+  <meta property="og:title" content="UnwindAI — Data, AI & Energy Upgrades">
+  <meta property="og:description" content="Ask our AI assistant anything about data automation, VEU energy upgrades, or our free tools.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <a class="nav-logo" href="/">unwind<span>AI</span></a>
+  <ul class="nav-links">
+    <li><a href="/data">Data & AI</a></li>
+    <li><a href="/energy">Energy Upgrades</a></li>
+    <li><a href="/gadgets">Gadgets</a></li>
+    <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero + Chatbot -->
+<section class="hero">
+  <div class="hero-tag">AI · Data · Energy · Tools</div>
+  <h1>What would you<br>like to know?</h1>
+  <p class="hero-sub">Ask about data automation, free energy upgrades, or our tools</p>
+  <div class="chat-widget" id="homepage-chat"></div>
+</section>
+
+<!-- Service Cards -->
+<section class="services">
+  <div class="container">
+    <h2 class="services-title">How can we help?</h2>
+    <p class="services-sub">Three ways UnwindAI works for you</p>
+    <div class="cards-grid">
+      <a class="card" href="/data">
+        <div class="card-accent" style="background: linear-gradient(90deg, #1e3a8a, #3b82f6)"></div>
+        <div class="card-icon">📊</div>
+        <h3>Data Automation & AI Integration</h3>
+        <p>Custom data pipelines, Smartsheet & Alteryx solutions, and AI/ML systems. Built for Australian businesses that run on data.</p>
+      </a>
+      <a class="card" href="/energy">
+        <div class="card-accent" style="background: linear-gradient(90deg, #16a34a, #22c55e)"></div>
+        <div class="card-icon">⚡</div>
+        <h3>VEU Energy Upgrades</h3>
+        <p>Is your Victorian home eligible for a <strong>FREE</strong> energy upgrade? Check your eligibility in 2 minutes — zero cost to you.</p>
+      </a>
+      <a class="card" href="/gadgets">
+        <div class="card-accent" style="background: linear-gradient(90deg, #7c3aed, #a78bfa)"></div>
+        <div class="card-icon">🛠️</div>
+        <h3>Free Gadgets & Tools</h3>
+        <p>SMSF eligibility checker, bank statement summariser, and more. Free tools built by a data engineer who actually uses them.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="/data">Data & AI</a>
+    <a href="/energy">Energy Upgrades</a>
+    <a href="/gadgets">Gadgets</a>
+    <a href="https://www.linkedin.com/in/thomas-taresch/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:thomas.taresch@unwindai.com.au">Contact</a>
+  </div>
+  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp; +61 476 905 033 &nbsp;·&nbsp; thomas.taresch@unwindai.com.au</p>
+</footer>
+
+<script src="/js/chat.js"></script>
+<script>
+  new ChatWidget('homepage-chat', '/api/chat', {
+    placeholder: 'Ask me anything — data, energy upgrades, or our tools…'
+  });
+</script>
+
+</body>
+</html>
