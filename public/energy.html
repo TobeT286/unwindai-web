@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VEU Energy Upgrades — UnwindAI</title>
+  <meta name="description" content="Victorian Energy Upgrades — check if your home is eligible for a government-subsidised energy upgrade.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+  <ul class="nav-links">
+    <li><a href="/data">Data & AI</a></li>
+    <li><a href="/energy">Energy Upgrades</a></li>
+    <li><a href="/gadgets">Gadgets</a></li>
+    <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero" style="background: linear-gradient(160deg, #052e16 0%, #15803d 45%, #16a34a 75%, #22c55e 100%);">
+  <h1>VEU Energy<br>Upgrades</h1>
+  <p class="hero-sub">Find out if your Victorian home qualifies for a government-subsidised energy upgrade</p>
+  <div class="chat-widget" id="energy-chat"></div>
+</section>
+
+<section class="services">
+  <div class="container">
+    <h2 class="services-title">Coming Soon</h2>
+    <p style="text-align:center;color:var(--c-muted);margin-top:0.5rem;">Full eligibility checker and booking form launching shortly. In the meantime, ask our AI agent above.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="/data">Data & AI</a>
+    <a href="/energy">Energy Upgrades</a>
+    <a href="/gadgets">Gadgets</a>
+    <a href="mailto:thomas.taresch@unwindai.com.au">Contact</a>
+  </div>
+  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp; thomas.taresch@unwindai.com.au</p>
+</footer>
+
+<script src="/js/chat.js"></script>
+<script>
+  new ChatWidget('energy-chat', '/api/chat', {
+    placeholder: 'Ask me about VEU energy upgrades and eligibility…',
+    darkMode: true
+  });
+</script>
+
+</body>
+</html>

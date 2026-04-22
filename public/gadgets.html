@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Gadgets & Tools — UnwindAI</title>
+  <meta name="description" content="SMSF eligibility checker, bank statement summariser, and more. Free tools built by a data engineer.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+  <ul class="nav-links">
+    <li><a href="/data">Data & AI</a></li>
+    <li><a href="/energy">Energy Upgrades</a></li>
+    <li><a href="/gadgets">Gadgets</a></li>
+    <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero" style="background: linear-gradient(160deg, #2e1065 0%, #6d28d9 45%, #7c3aed 75%, #a78bfa 100%);">
+  <h1>Free Gadgets<br>& Tools</h1>
+  <p class="hero-sub">SMSF eligibility checker, bank statement summariser, and more — free tools from a data engineer</p>
+  <div class="chat-widget" id="gadgets-chat"></div>
+</section>
+
+<section class="services">
+  <div class="container">
+    <h2 class="services-title">Coming Soon</h2>
+    <p style="text-align:center;color:var(--c-muted);margin-top:0.5rem;">Tools launching shortly. Ask our AI agent above what's available or get notified when they drop.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="/data">Data & AI</a>
+    <a href="/energy">Energy Upgrades</a>
+    <a href="/gadgets">Gadgets</a>
+    <a href="mailto:thomas.taresch@unwindai.com.au">Contact</a>
+  </div>
+  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp; thomas.taresch@unwindai.com.au</p>
+</footer>
+
+<script src="/js/chat.js"></script>
+<script>
+  new ChatWidget('gadgets-chat', '/api/chat', {
+    placeholder: 'Ask me about our free tools and what they can do…',
+    darkMode: true
+  });
+</script>
+
+</body>
+</html>

@@ -9,7 +9,7 @@
   --c-muted:        #64748b;
   --c-border:       #e2e8f0;
   --c-surface:      #ffffff;
-  --gradient-hero:  linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 40%, #4f46e5 70%, #7c3aed 100%);
+  --gradient-hero:  linear-gradient(160deg, #0f172a 0%, #0369a1 45%, #0891b2 75%, #06b6d4 100%);
   --font:           -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --radius:         12px;
   --shadow:         0 1px 8px rgba(0,0,0,0.07);
@@ -165,9 +165,115 @@ img { max-width: 100%; display: block; }
 }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
 .card-accent { height: 4px; border-radius: 2px; margin-bottom: 1.25rem; }
-.card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
 .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
 .card p { font-size: 0.875rem; color: var(--c-muted); line-height: 1.55; }
+
+/* ── Card Illustrations ──────────────────────────────── */
+.card-illustration {
+  height: 90px; margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+  position: relative; overflow: hidden;
+}
+
+/* Data card — bar chart + bot */
+.ci-screen {
+  width: 56px; height: 68px;
+  background: #eff6ff; border-radius: 6px;
+  border: 1.5px solid #bfdbfe;
+  display: flex; align-items: flex-end; gap: 4px;
+  padding: 8px 6px 6px;
+}
+.ci-bar {
+  flex: 1; border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #3b82f6, #1e3a8a);
+  transition: height 0.4s ease;
+}
+.ci-bar--1 { height: 55%; }
+.ci-bar--2 { height: 80%; }
+.ci-bar--3 { height: 40%; }
+.card--data:hover .ci-bar--1 { height: 70%; }
+.card--data:hover .ci-bar--2 { height: 95%; }
+.card--data:hover .ci-bar--3 { height: 60%; }
+.ci-bot {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.ci-bot-head {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  border: 2px solid #bfdbfe;
+  position: relative;
+}
+.ci-bot-head::before, .ci-bot-head::after {
+  content: ''; position: absolute;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #fff; top: 9px;
+}
+.ci-bot-head::before { left: 6px; }
+.ci-bot-head::after { right: 6px; }
+.ci-bot-bubble {
+  background: #1d4ed8; color: #fff;
+  font-size: 0.6rem; font-weight: 700;
+  padding: 2px 6px; border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+
+/* Energy card — AC unit + badge */
+.ci-ac {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1.5px solid #86efac;
+  border-radius: 8px; padding: 8px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.ci-ac-unit {
+  width: 52px; height: 20px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  border-radius: 4px;
+}
+.ci-ac-vents {
+  display: flex; gap: 5px;
+}
+.ci-ac-vents span {
+  width: 12px; height: 3px; border-radius: 2px;
+  background: #4ade80;
+  animation: ventPulse 1.8s ease-in-out infinite;
+}
+.ci-ac-vents span:nth-child(2) { animation-delay: 0.3s; }
+.ci-ac-vents span:nth-child(3) { animation-delay: 0.6s; }
+@keyframes ventPulse {
+  0%, 100% { opacity: 0.4; transform: scaleX(1); }
+  50% { opacity: 1; transform: scaleX(1.15); }
+}
+.ci-badge {
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  color: #fff; font-size: 0.65rem; font-weight: 600;
+  text-align: center; padding: 6px 10px; border-radius: 8px;
+  line-height: 1.3;
+}
+.ci-badge strong { font-size: 0.85rem; }
+
+/* Gadgets card — stacked coins + clock */
+.card-illustration--gadgets {
+  position: relative; justify-content: center;
+}
+.ci-coin {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: #fff; font-weight: 800; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(124,58,237,0.35);
+  position: absolute;
+  transition: transform 0.25s ease;
+}
+.ci-coin--1 { left: 10px; top: 50%; transform: translateY(-60%); z-index: 3; }
+.ci-coin--2 { left: 30px; top: 50%; transform: translateY(-40%); z-index: 2; }
+.ci-coin--3 { left: 50px; top: 50%; transform: translateY(-60%); z-index: 1; }
+.card--gadgets:hover .ci-coin--1 { transform: translateY(-80%); }
+.card--gadgets:hover .ci-coin--2 { transform: translateY(-55%); }
+.card--gadgets:hover .ci-coin--3 { transform: translateY(-80%); }
+.ci-clock {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 1.8rem;
+}
 
 /* ── Buttons ─────────────────────────────────────────── */
 .btn {
