@@ -1,12 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/chat.js": { "maxDuration": 60, "includeFiles": "context/**" },
-    "api/chat-energy.js": { "maxDuration": 60, "includeFiles": "context/**" },
-    "api/chat-data.js": { "maxDuration": 60, "includeFiles": "context/**" },
-    "api/chat-gadgets.js": { "maxDuration": 60, "includeFiles": "context/**" },
-    "api/lead.js": { "maxDuration": 30 },
-    "api/analyse.js": { "maxDuration": 60, "includeFiles": "context/**" }
+    "api/chat.js": { "maxDuration": 60, "includeFiles": "context/**" }
   },
   "routes": [
     { "src": "/energy", "dest": "/energy.html" },
