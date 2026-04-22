@@ -26,11 +26,13 @@ img { max-width: 100%; display: block; }
 /* ── Nav ────────────────────────────────────────────── */
 .nav {
   position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.9rem 2rem;
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--c-border);
+}
+.nav-inner {
+  max-width: 960px; margin: 0 auto; padding: 0.9rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo { text-decoration: none; display: flex; align-items: center; }
 .nav-logo-img { height: 36px; width: auto; display: block; }
@@ -122,6 +124,21 @@ img { max-width: 100%; display: block; }
 .chat-input-row button:hover { background: #e8f0fe; }
 .chat-input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Light chat variant — semi-opaque white on coloured hero backgrounds */
+.chat-widget--light {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+}
+.chat-widget--light .chat-input-row input {
+  background: rgba(255,255,255,0.92);
+  color: var(--c-text);
+}
+.chat-widget--light .chat-input-row button {
+  background: #fff;
+  color: var(--c-green);
+}
+.chat-widget--light .chat-input-row button:hover { background: #f0fdf4; }
+
 /* Dark-background chat variant (used on sub-pages) */
 .chat-widget--dark {
   background: rgba(15,23,42,0.7);
@@ -145,7 +162,7 @@ img { max-width: 100%; display: block; }
 }
 .services-title {
   text-align: center; font-size: 1.75rem; font-weight: 800;
-  margin-bottom: 0.5rem;
+  margin-bottom: 2.5rem;
 }
 .services-sub {
   text-align: center; color: var(--c-muted);
@@ -275,6 +292,62 @@ img { max-width: 100%; display: block; }
   font-size: 1.8rem;
 }
 
+/* ── Testimonials ───────────────────────────────────── */
+.testimonials {
+  background: #f8faff;
+  padding: 3.5rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+}
+.testimonials-title {
+  text-align: center; font-size: 1.5rem; font-weight: 800;
+  color: var(--c-text); margin-bottom: 2rem;
+}
+.testimonials-wrapper { max-width: 760px; margin: 0 auto; }
+.testimonials-carousel { position: relative; overflow: hidden; }
+.testimonials-track { display: flex; transition: transform 0.45s ease; }
+.testimonial-slide { min-width: 100%; padding: 0 3rem; }
+.testimonial-card {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 2rem 2.5rem;
+  box-shadow: var(--shadow); text-align: center;
+}
+.testimonial-quote {
+  font-size: 1rem; line-height: 1.75; color: var(--c-text);
+  font-style: italic; margin-bottom: 1.25rem;
+}
+.testimonial-quote::before { content: '\201C'; }
+.testimonial-quote::after  { content: '\201D'; }
+.testimonial-author { font-weight: 700; font-size: 0.95rem; color: var(--c-primary); }
+.testimonial-service { font-size: 0.78rem; color: var(--c-muted); margin-top: 0.2rem; }
+.testimonials-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  cursor: pointer; font-size: 1rem; color: var(--c-text);
+  box-shadow: var(--shadow); transition: box-shadow 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.testimonials-arrow:hover { box-shadow: var(--shadow-lg); }
+.testimonials-arrow--prev { left: 0; }
+.testimonials-arrow--next { right: 0; }
+.testimonials-dots {
+  display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.25rem;
+}
+.testimonials-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c-border); cursor: pointer; border: none;
+  transition: background 0.2s; padding: 0;
+}
+.testimonials-dot.active { background: var(--c-primary); }
+
+/* ── Contact reveal (footer anti-scraping) ───────── */
+.contact-reveal {
+  background: none; border: none; cursor: pointer;
+  color: #60a5fa; font-size: inherit; font-family: var(--font);
+  padding: 0; text-decoration: underline; text-underline-offset: 2px;
+}
+.contact-reveal:hover { color: #93c5fd; }
+
 /* ── Buttons ─────────────────────────────────────────── */
 .btn {
   display: inline-block; padding: 0.75rem 1.5rem;
@@ -306,8 +379,10 @@ img { max-width: 100%; display: block; }
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 640px) {
   .hero { padding: 3.5rem 1rem 3rem; }
-  .nav { padding: 0.75rem 1rem; }
+  .nav-inner { padding: 0.75rem 1rem; }
   .nav-links { display: none; }
   .services { padding: 3rem 1rem; }
   .chat-widget { padding: 1rem; }
+  .testimonial-slide { padding: 0 2.5rem; }
+  .testimonial-card { padding: 1.5rem 1.25rem; }
 }

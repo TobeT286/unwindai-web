@@ -81,7 +81,9 @@ class ChatWidget {
             assistantText += text;
             thinkingEl.textContent = assistantText;
             this._messages().scrollTop = this._messages().scrollHeight;
-          } catch { /* ignore malformed chunks */ }
+          } catch (e) {
+            if (!(e instanceof SyntaxError)) throw e; // re-throw API errors, swallow malformed JSON
+          }
         }
       }
 

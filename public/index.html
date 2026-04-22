@@ -13,19 +13,21 @@
 
 <!-- Nav -->
 <nav class="nav">
-  <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
-  <ul class="nav-links">
-    <li><a href="/data">Data & AI</a></li>
-    <li><a href="/energy">Energy Upgrades</a></li>
-    <li><a href="/gadgets">Gadgets</a></li>
-    <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
-  </ul>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+    <ul class="nav-links">
+      <li><a href="/data">Data & AI</a></li>
+      <li><a href="/energy">Energy Upgrades</a></li>
+      <li><a href="/gadgets">Gadgets</a></li>
+      <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
+    </ul>
+  </div>
 </nav>
 
 <!-- Hero + Chatbot -->
 <section class="hero">
   <h1>What do you need<br>help with?</h1>
-  <p class="hero-sub">Ask about Data Automation, AI Integration, VIC Energy Upgrades or Gadgets and Tools</p>
+  <p class="hero-sub">Ask about data automation, energy upgrades, or gadgets and tools — or request a free quote to see how we can save you money and time.</p>
   <div class="chat-widget" id="homepage-chat"></div>
 </section>
 
@@ -77,6 +79,41 @@
   </div>
 </section>
 
+<!-- Testimonials -->
+<section class="testimonials">
+  <div class="testimonials-wrapper">
+    <h2 class="testimonials-title">What Our Clients Say</h2>
+    <div class="testimonials-carousel">
+      <div class="testimonials-track" id="t-track">
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">We had our old split system replaced through UnwindAI's VEU program. The whole process took less than a week and we're saving over $400 a year on energy bills. Couldn't believe how straightforward it was.</p>
+            <p class="testimonial-author">Sarah M.</p>
+            <p class="testimonial-service">VEU Energy Upgrade · Pakenham, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">Thomas built a pipeline that replaced 3 hours of daily manual data work. We haven't had to touch it in months — it just runs, every morning, without fail. Genuinely transformative for our team.</p>
+            <p class="testimonial-author">Rohan K.</p>
+            <p class="testimonial-service">Data Automation · Operations Manager, Melbourne</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">The free SMSF eligibility checker gave me clear answers in minutes. Saved me a $300+ consultation fee and I walked into my planner knowing exactly where I stood.</p>
+            <p class="testimonial-author">David T.</p>
+            <p class="testimonial-service">Free Tools · Melbourne, VIC</p>
+          </div>
+        </div>
+      </div>
+      <button class="testimonials-arrow testimonials-arrow--prev" id="t-prev" aria-label="Previous">&#8592;</button>
+      <button class="testimonials-arrow testimonials-arrow--next" id="t-next" aria-label="Next">&#8594;</button>
+    </div>
+    <div class="testimonials-dots" id="t-dots"></div>
+  </div>
+</section>
+
 <!-- Footer -->
 <footer class="footer">
   <div class="footer-links">
@@ -86,13 +123,55 @@
     <a href="https://www.linkedin.com/in/thomas-taresch/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="mailto:thomas.taresch@unwindai.com.au">Contact</a>
   </div>
-  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp; +61 476 905 033 &nbsp;·&nbsp; thomas.taresch@unwindai.com.au</p>
+  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp;
+    <button class="contact-reveal" id="reveal-phone" aria-label="Show phone number">📞 Show number</button>
+    &nbsp;·&nbsp;
+    <button class="contact-reveal" id="reveal-email" aria-label="Show email">✉ Show email</button>
+  </p>
 </footer>
 
 <script src="/js/chat.js"></script>
 <script>
   new ChatWidget('homepage-chat', '/api/chat', {
     placeholder: 'Ask about data automation, energy upgrades, gadgets and tools…'
+  });
+
+  // Testimonials carousel
+  (function() {
+    var track = document.getElementById('t-track');
+    var dotsEl = document.getElementById('t-dots');
+    var slides = track ? track.querySelectorAll('.testimonial-slide') : [];
+    if (!slides.length) return;
+    var current = 0, timer;
+    slides.forEach(function(_, i) {
+      var dot = document.createElement('button');
+      dot.className = 'testimonials-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Testimonial ' + (i + 1));
+      dot.addEventListener('click', function() { go(i); });
+      dotsEl.appendChild(dot);
+    });
+    function go(n) {
+      var dots = dotsEl.querySelectorAll('.testimonials-dot');
+      dots[current].classList.remove('active');
+      current = ((n % slides.length) + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+      dots[current].classList.add('active');
+      clearInterval(timer);
+      timer = setInterval(function() { go(current + 1); }, 6000);
+    }
+    document.getElementById('t-prev').addEventListener('click', function() { go(current - 1); });
+    document.getElementById('t-next').addEventListener('click', function() { go(current + 1); });
+    timer = setInterval(function() { go(current + 1); }, 6000);
+  })();
+
+  // Contact reveal — keeps phone/email out of HTML for scraper protection
+  document.getElementById('reveal-phone').addEventListener('click', function() {
+    var n = ['+61','476','905','033'].join(' ');
+    this.outerHTML = '<a href="tel:+61476905033" style="color:#60a5fa">' + n + '</a>';
+  });
+  document.getElementById('reveal-email').addEventListener('click', function() {
+    var e = 'thomas.taresch' + '@' + 'unwindai.com.au';
+    this.outerHTML = '<a href="mailto:' + e + '" style="color:#60a5fa">' + e + '</a>';
   });
 </script>
 

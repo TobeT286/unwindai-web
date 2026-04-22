@@ -10,19 +10,21 @@
 <body>
 
 <nav class="nav">
-  <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
-  <ul class="nav-links">
-    <li><a href="/data">Data & AI</a></li>
-    <li><a href="/energy">Energy Upgrades</a></li>
-    <li><a href="/gadgets">Gadgets</a></li>
-    <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
-  </ul>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+    <ul class="nav-links">
+      <li><a href="/data">Data & AI</a></li>
+      <li><a href="/energy">Energy Upgrades</a></li>
+      <li><a href="/gadgets">Gadgets</a></li>
+      <li><a href="mailto:thomas.taresch@unwindai.com.au">Contact</a></li>
+    </ul>
+  </div>
 </nav>
 
 <section class="hero" style="background: linear-gradient(160deg, #052e16 0%, #15803d 45%, #16a34a 75%, #22c55e 100%);">
   <h1>VEU Energy<br>Upgrades</h1>
   <p class="hero-sub">Find out if your Victorian home qualifies for a government-subsidised energy upgrade</p>
-  <div class="chat-widget" id="energy-chat"></div>
+  <div class="chat-widget chat-widget--light" id="energy-chat"></div>
 </section>
 
 <section class="services">
@@ -45,8 +47,7 @@
 <script src="/js/chat.js"></script>
 <script>
   new ChatWidget('energy-chat', '/api/chat', {
-    placeholder: 'Ask me about VEU energy upgrades and eligibility…',
-    darkMode: true
+    placeholder: 'Ask me about VEU energy upgrades and eligibility…'
   });
 </script>
 
