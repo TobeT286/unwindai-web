@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const contextPath = join(process.cwd(), 'context', 'thomas-context.md');
+  const contextPath = join(__dirname, '..', 'context', 'thomas-context.md');
   const systemPrompt = readFileSync(contextPath, 'utf-8');
 
   res.setHeader('Content-Type', 'text/event-stream');
