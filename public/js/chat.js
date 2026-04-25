@@ -1,14 +1,13 @@
-// public/js/chat.js
-// Reusable chat widget. Usage: new ChatWidget('element-id', '/api/chat', options)
+// public/js/chat.js  — reusable chat widget
 class ChatWidget {
   constructor(containerId, apiEndpoint, options = {}) {
     this.container = document.getElementById(containerId);
     this.apiEndpoint = apiEndpoint;
-    this.placeholder = options.placeholder || 'What would you like to know?';
+    this.placeholder = options.placeholder || 'Type here...';
     this.darkMode = options.darkMode || false;
     this.messages = [];
     this.busy = false;
-    this.pendingFile = null;   // { mediaType, data, name }
+    this.pendingFile = null;
     this._started = false;
     this._greetAborted = false;
     this._render();
@@ -23,30 +22,46 @@ class ChatWidget {
       <div class="chat-input-row">
         <label class="chat-attach-btn" title="Attach image or PDF" aria-label="Attach file">
           <input type="file" accept="image/*,.pdf" id="${id}-file" style="display:none">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-          </svg>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         </label>
         <span class="chat-attach-name" id="${id}-fname"></span>
         <input type="text" id="${id}-input" placeholder="${this.placeholder}" autocomplete="off"/>
         <button id="${id}-send" type="button" class="chat-send-btn" disabled aria-label="Send message">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
       </div>
     `;
-
     const input = this._input();
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); }
-    });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } });
     input.addEventListener('input', () => this._syncBtn());
     this._btn().addEventListener('click', () => this.send());
+    document.getElementById(`${id}-file`).addEventListener('change', e => this._handleFile(e.target.files[0]));
+    this._addVoiceBtn();
+  }
 
-    document.getElementById(`${id}-file`).addEventListener('change', (e) => {
-      this._handleFile(e.target.files[0]);
+  _addVoiceBtn() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-AU';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chat-voice-btn';
+    btn.setAttribute('aria-label', 'Voice input');
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
+    let recording = false;
+    btn.addEventListener('click', () => {
+      if (recording) { recognition.stop(); return; }
+      recording = true; btn.classList.add('active');
+      try { recognition.start(); } catch(e) { recording = false; btn.classList.remove('active'); }
     });
+    recognition.onresult = e => { this._input().value = e.results[0][0].transcript; this._syncBtn(); this._input().focus(); };
+    recognition.onend = () => { recording = false; btn.classList.remove('active'); };
+    recognition.onerror = () => { recording = false; btn.classList.remove('active'); };
+    const row = this.container.querySelector('.chat-input-row');
+    row.insertBefore(btn, this._btn());
   }
 
   _messages() { return document.getElementById(`${this.container.id}-messages`); }
@@ -55,17 +70,15 @@ class ChatWidget {
   _fname()    { return document.getElementById(`${this.container.id}-fname`); }
 
   _syncBtn() {
-    const hasText = this._input().value.trim().length > 0;
-    this._btn().disabled = !hasText && !this.pendingFile;
+    this._btn().disabled = this._input().value.trim().length === 0 && !this.pendingFile;
   }
 
   _handleFile(file) {
     if (!file) return;
     if (file.size > 4 * 1024 * 1024) { alert('File too large — please keep under 4 MB.'); return; }
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = e.target.result.split(',')[1];
-      this.pendingFile = { mediaType: file.type || 'application/octet-stream', data, name: file.name };
+    reader.onload = e => {
+      this.pendingFile = { mediaType: file.type || 'application/octet-stream', data: e.target.result.split(',')[1], name: file.name };
       this._fname().textContent = '📎 ' + file.name;
       this._syncBtn();
     };
@@ -75,8 +88,7 @@ class ChatWidget {
   _scheduleGreet() {
     setTimeout(() => {
       if (this._started || this._greetAborted) return;
-      const msg = 'Ask me anything — data automation, data platforms, VEU energy upgrades, or helpful gadgets for personal or business finance. You can also attach a floor plan, property contract, or PDF and I\'ll review it for you.';
-      this._typeGreet(msg, 26);
+      this._typeGreet('Ask me anything — our services range from Data Platforms, Data Process Automations, AI and ML Integration Solutions and Services to VEU Energy Upgrades. We also build custom tools and gadgets to help with your daily churn. You can attach a floor plan, property contract, or PDF and I\'ll review it for you.', 24);
     }, 1200);
   }
 
@@ -91,6 +103,7 @@ class ChatWidget {
         setTimeout(tick, delayMs);
       } else {
         el.className = 'chat-message chat-message--assistant';
+        el.innerHTML = this._renderMarkdown(el.textContent);
       }
     };
     tick();
@@ -110,9 +123,7 @@ class ChatWidget {
     this._input().value = '';
     this._syncBtn();
 
-    // Build content — support file attachments
-    let userContent;
-    let displayText = text;
+    let userContent, displayText = text;
     if (this.pendingFile) {
       const isDoc = this.pendingFile.mediaType === 'application/pdf';
       const fileBlock = isDoc
@@ -165,19 +176,20 @@ class ChatWidget {
             if (chunk.error) throw new Error(chunk.error);
             if (chunk.text) {
               assistantText += chunk.text;
-              thinkingEl.textContent = assistantText;
+              thinkingEl.textContent = assistantText; // plain during stream
               this._messages().scrollTop = this._messages().scrollHeight;
             }
-          } catch (e) {
-            if (!(e instanceof SyntaxError)) throw e;
-          }
+          } catch (e) { if (!(e instanceof SyntaxError)) throw e; }
         }
       }
 
+      // Apply markdown formatting after stream completes
+      thinkingEl.innerHTML = this._renderMarkdown(assistantText);
+      this._messages().scrollTop = this._messages().scrollHeight;
       this.messages.push({ role: 'assistant', content: assistantText });
     } catch (err) {
       thinkingEl.className = 'chat-message chat-message--assistant';
-      thinkingEl.textContent = err.message; // show actual error for diagnostics
+      thinkingEl.textContent = err.message;
     } finally {
       this.busy = false;
       this._syncBtn();
@@ -190,6 +202,41 @@ class ChatWidget {
     if (msgs) msgs.style.maxHeight = '380px';
     const hero = document.getElementById('hero-section');
     if (hero) hero.classList.add('hero--chatting');
+  }
+
+  // Simple markdown → safe HTML renderer
+  _renderMarkdown(raw) {
+    const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const inline = s => s
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code class="md-code">$1</code>');
+
+    const lines = raw.split('\n');
+    const out = [];
+    let inList = false;
+
+    for (let line of lines) {
+      line = line.trimEnd();
+      const isBullet = /^[-*•] /.test(line);
+      const isNumbered = /^\d+\. /.test(line);
+
+      if (isBullet || isNumbered) {
+        if (!inList) { out.push('<ul class="md-ul">'); inList = true; }
+        const content = isBullet ? line.replace(/^[-*•] /, '') : line.replace(/^\d+\. /, '');
+        out.push('<li>' + inline(esc(content)) + '</li>');
+        continue;
+      }
+      if (inList) { out.push('</ul>'); inList = false; }
+
+      if (line.startsWith('### '))      out.push('<p class="md-h4">' + inline(esc(line.slice(4))) + '</p>');
+      else if (line.startsWith('## ')) out.push('<p class="md-h3">' + inline(esc(line.slice(3))) + '</p>');
+      else if (line.startsWith('# '))  out.push('<p class="md-h3">' + inline(esc(line.slice(2))) + '</p>');
+      else if (line.trim() === '')     out.push('<div class="md-gap"></div>');
+      else                             out.push('<p class="md-p">' + inline(esc(line)) + '</p>');
+    }
+    if (inList) out.push('</ul>');
+    return out.join('');
   }
 
   _appendMessage(type, text) {

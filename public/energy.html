@@ -12,6 +12,10 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+    <div class="nav-veu">
+      <img src="/images/veu_logo.png" alt="VEU Accredited" class="nav-veu-logo">
+      <span class="nav-veu-acc">Accreditation No. AA003264</span>
+    </div>
     <ul class="nav-links">
       <li><a href="/data">Data & AI</a></li>
       <li><a href="/energy">Energy Upgrades</a></li>
@@ -21,33 +25,343 @@
   </div>
 </nav>
 
-<section class="hero" style="background: linear-gradient(160deg, #052e16 0%, #15803d 45%, #16a34a 75%, #22c55e 100%);">
-  <h1>VEU Energy<br>Upgrades</h1>
-  <p class="hero-sub">Find out if your Victorian home qualifies for a government-subsidised energy upgrade</p>
-  <div class="chat-widget chat-widget--light" id="energy-chat"></div>
+<!-- Hero + Chat -->
+<section class="hero" id="hero-section" style="background: linear-gradient(160deg, #052e16 0%, #15803d 45%, #16a34a 75%, #22c55e 100%);">
+  <div class="hero-top">
+    <div class="hero-title-group">
+      <h1>VEU Energy Upgrades</h1>
+      <p class="hero-sub">Find out if your Victorian home qualifies for a heavily subsidised energy upgrade — heat pumps, split systems, ducted reverse cycle and more.</p>
+    </div>
+    <div class="hero-prompts" id="hero-prompts">
+      <button class="prompt-chip" data-prompt="My home has a gas ducted heater. What VEU energy upgrades am I eligible for and how much would I pay out of pocket?">🔥 Replace my gas ducted heater?</button>
+      <button class="prompt-chip" data-prompt="I have an old gas hot water system. Can I get a heat pump hot water system subsidised through VEU and how does the process work?">💧 Replace gas hot water with heat pump?</button>
+      <button class="prompt-chip" data-prompt="My 4-bedroom home has no air conditioning at all. What multi-head or ducted system can I get through the VEU program and what would I pay?">❄️ Add cooling to my whole home?</button>
+    </div>
+  </div>
+  <div class="chat-widget chat-widget--dark" id="energy-chat"></div>
 </section>
 
-<section class="services">
+<!-- What's on Offer -->
+<section class="offers-section">
   <div class="container">
-    <h2 class="services-title">Coming Soon</h2>
-    <p style="text-align:center;color:var(--c-muted);margin-top:0.5rem;">Full eligibility checker and booking form launching shortly. In the meantime, ask our AI agent above.</p>
+    <h2 class="services-title">What's on Offer</h2>
+    <p style="text-align:center;color:var(--c-muted);max-width:600px;margin:0 auto 2rem;">Under the Victorian Energy Upgrades program, eligible Victorian homeowners can access heavily subsidised energy-efficient systems. Typical out-of-pocket costs below.</p>
+    <div class="offers-grid">
+      <div class="offer-card">
+        <div class="offer-icon">❄️</div>
+        <h3>Single Split System</h3>
+        <p class="offer-price">From <strong>$599</strong></p>
+        <ul class="offer-checklist">
+          <li>Heating &amp; cooling in one unit</li>
+          <li>Non-ducted systems under 10 kW</li>
+          <li>Installed in one room or zone</li>
+          <li>Available brands: Rinnai, Midea, Hisense, Daikin, Panasonic</li>
+        </ul>
+      </div>
+      <div class="offer-card offer-card--featured">
+        <div class="offer-badge">Most Popular</div>
+        <div class="offer-icon">🏠</div>
+        <h3>Multi-Head Split System</h3>
+        <p class="offer-price">From <strong>$1,999</strong></p>
+        <ul class="offer-checklist">
+          <li>Multiple rooms from one outdoor unit</li>
+          <li>Heat &amp; cool 2–5 zones</li>
+          <li>Replaces multiple old units or gas heaters</li>
+          <li>Available brands: Mitsubishi, Daikin, Panasonic</li>
+        </ul>
+      </div>
+      <div class="offer-card">
+        <div class="offer-icon">🌡️</div>
+        <h3>Ducted Reverse Cycle</h3>
+        <p class="offer-price">From <strong>$5,649</strong></p>
+        <ul class="offer-checklist">
+          <li>Whole-home heating &amp; cooling</li>
+          <li>Replaces existing gas ducted systems</li>
+          <li>Zoned control available</li>
+          <li>Available brands: Mitsubishi, Daikin, Panasonic</li>
+        </ul>
+      </div>
+      <div class="offer-card">
+        <div class="offer-icon">💧</div>
+        <h3>Heat Pump Hot Water</h3>
+        <p class="offer-price">From <strong>$200</strong></p>
+        <ul class="offer-checklist">
+          <li>Up to 75% less energy than gas</li>
+          <li>Replaces gas storage or continuous-flow systems</li>
+          <li>Runs on electricity — pairs with solar</li>
+          <li>Available brands: Rinnai, Midea, Sanden</li>
+        </ul>
+      </div>
+    </div>
+    <p style="text-align:center;color:var(--c-muted);font-size:0.78rem;margin-top:1.5rem;">Co-payment amounts subject to ESC rules and property eligibility. Payment plans available from $26.69/week. <a href="#enquiry" style="color:var(--c-primary);">Contact us</a> for a free site assessment.</p>
   </div>
 </section>
 
+<!-- Client Reviews -->
+<section class="energy-reviews">
+  <div class="container">
+    <h2 class="services-title">What Our Clients Say</h2>
+    <div class="testimonials-carousel" style="margin-top:1.5rem;">
+      <div class="testimonials-track" id="er-track">
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">Had our old gas ducted heater ripped out and a 3-head split system installed through the VEU scheme. The team was professional, clean and efficient — done in a day. We paid $1,000 out of pocket for a system worth over $7,000. Couldn't be happier.</p>
+            <p class="testimonial-author">James & Karen P.</p>
+            <p class="testimonial-service">Multi-head Split System · Berwick, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">Got our old gas hot water system removed and a heat pump installed under the VEU program. The difference in our energy bills has been incredible — and the whole experience from the website chat to installation day was seamless.</p>
+            <p class="testimonial-author">Lisa R.</p>
+            <p class="testimonial-service">Heat Pump Hot Water · Frankston, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">Single split system for the master bedroom — cool in summer, warm in winter. Paid $200 out of pocket through the VEU rebate. The whole install took 3 hours and the team left everything spotless.</p>
+            <p class="testimonial-author">Aisha M.</p>
+            <p class="testimonial-service">Single Split System · Dandenong, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">We had a massive old gas ducted system that was costing us a fortune to run. The VEU program covered most of the cost for a brand new ducted reverse cycle. Our winter bills dropped nearly 60%. Highly recommend going through UnwindAI.</p>
+            <p class="testimonial-author">Mark & Sue T.</p>
+            <p class="testimonial-service">Ducted Reverse Cycle · Pakenham, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">The heat pump hot water system is brilliant. Installation was quick, the old gas unit was taken away, and my quarterly energy bill has dropped by over $200 already. The team explained everything clearly and the chat tool on the website made it easy to get started.</p>
+            <p class="testimonial-author">Priya K.</p>
+            <p class="testimonial-service">Heat Pump Hot Water · Glen Waverley, VIC</p>
+          </div>
+        </div>
+      </div>
+      <button class="testimonials-arrow testimonials-arrow--prev" id="er-prev" aria-label="Previous">&#8592;</button>
+      <button class="testimonials-arrow testimonials-arrow--next" id="er-next" aria-label="Next">&#8594;</button>
+    </div>
+    <div class="testimonials-dots" id="er-dots"></div>
+  </div>
+</section>
+
+<!-- Featured Systems -->
+<section class="systems-section">
+  <div class="container">
+    <h2 class="services-title">Featured Systems</h2>
+    <p style="text-align:center;color:var(--c-muted);max-width:600px;margin:0 auto 2rem;">These are some of the high-quality systems available through the VEU program. All come with professional installation and removal of your old system.</p>
+    <div class="systems-grid">
+
+      <div class="system-card">
+        <div class="system-badge system-badge--green">Heat Pump Hot Water</div>
+        <h3 class="system-name">Emerald Energy Series</h3>
+        <p class="system-brand">Emerald Energy</p>
+        <ul class="system-specs">
+          <li><span class="spec-label">Capacity</span><span class="spec-val">200 L – 315 L</span></li>
+          <li><span class="spec-label">COP Rating</span><span class="spec-val">Up to 4.5</span></li>
+          <li><span class="spec-label">Warranty</span><span class="spec-val">5 years parts &amp; labour</span></li>
+          <li><span class="spec-label">Energy saving</span><span class="spec-val">Up to 75% vs gas</span></li>
+        </ul>
+        <p class="system-features">Quiet operation, solar-ready, timer function for off-peak charging. Suitable for families of 2–6.</p>
+        <a href="#enquiry" class="system-cta">Get a Quote</a>
+      </div>
+
+      <div class="system-card system-card--featured">
+        <div class="system-badge system-badge--blue">Split System</div>
+        <h3 class="system-name">Bronte Series</h3>
+        <p class="system-brand">Mitsubishi Heavy Industries</p>
+        <ul class="system-specs">
+          <li><span class="spec-label">Capacity</span><span class="spec-val">2.5 kW – 7.1 kW</span></li>
+          <li><span class="spec-label">Star Rating</span><span class="spec-val">5-star cooling / 4-star heating</span></li>
+          <li><span class="spec-label">Warranty</span><span class="spec-val">7 years parts &amp; labour</span></li>
+          <li><span class="spec-label">Noise</span><span class="spec-val">From 19 dB(A)</span></li>
+        </ul>
+        <p class="system-features">Ultra-quiet, 3D auto airflow, weekly timer, self-cleaning filter. Ideal for bedrooms, living areas, and offices.</p>
+        <a href="#enquiry" class="system-cta">Get a Quote</a>
+      </div>
+
+      <div class="system-card">
+        <div class="system-badge system-badge--purple">Multi-head / Ducted</div>
+        <h3 class="system-name">Aero Series</h3>
+        <p class="system-brand">Panasonic</p>
+        <ul class="system-specs">
+          <li><span class="spec-label">Capacity</span><span class="spec-val">5.0 kW – 14.0 kW</span></li>
+          <li><span class="spec-label">Star Rating</span><span class="spec-val">6-star cooling &amp; heating</span></li>
+          <li><span class="spec-label">Warranty</span><span class="spec-val">5 years parts &amp; labour</span></li>
+          <li><span class="spec-label">Refrigerant</span><span class="spec-val">R32 (low GWP)</span></li>
+        </ul>
+        <p class="system-features">Nanoe-X air purification, Wi-Fi control via app, inverter compressor for consistent comfort. Suits 3–5 bedroom homes.</p>
+        <a href="#enquiry" class="system-cta">Get a Quote</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Enquiry Form -->
+<section class="enquiry-section" id="enquiry">
+  <div class="container">
+    <h2 class="services-title">Check Your Eligibility</h2>
+    <p style="text-align:center;color:var(--c-muted);max-width:560px;margin:0 auto 2rem;">Tell us about your home and we'll confirm eligibility, recommend the right system, and get a quote to you within 24 hours. No obligation.</p>
+    <form class="enquiry-form" id="energy-enquiry-form" enctype="multipart/form-data">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eq-name">Your name</label>
+          <input type="text" id="eq-name" name="name" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label for="eq-phone">Phone number</label>
+          <input type="tel" id="eq-phone" name="phone" placeholder="+61 4XX XXX XXX" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eq-email">Email</label>
+          <input type="email" id="eq-email" name="email" placeholder="jane@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="eq-suburb">Suburb / postcode</label>
+          <input type="text" id="eq-suburb" name="suburb" placeholder="Frankston 3199" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eq-upgrade">What upgrade are you interested in?</label>
+          <select id="eq-upgrade" name="upgrade">
+            <option value="">— Select —</option>
+            <option>Single split system (1 room)</option>
+            <option>Multi-head split system (multiple rooms)</option>
+            <option>Ducted reverse cycle (whole home)</option>
+            <option>Heat pump hot water</option>
+            <option>Not sure — advise me</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="eq-existing">Current heating / hot water system</label>
+          <select id="eq-existing" name="existing">
+            <option value="">— Select —</option>
+            <option>Gas ducted heater</option>
+            <option>Gas wall / space heaters</option>
+            <option>Gas hot water (storage)</option>
+            <option>Gas hot water (continuous flow)</option>
+            <option>Electric hot water</option>
+            <option>No existing system</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="eq-message">Any extra details (optional)</label>
+        <textarea id="eq-message" name="message" rows="3" placeholder="E.g. 4-bedroom home, 2 storeys, already have solar panels..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="eq-file">Attach floor plan or photo (optional — helps us size the system)</label>
+        <label for="eq-file" class="form-file-label" id="eq-file-label">📎 Click to attach a file (image or PDF)</label>
+        <input type="file" id="eq-file" name="file" accept="image/*,.pdf" class="form-file-input">
+      </div>
+      <button type="submit" class="form-submit-btn" id="eq-submit">Send My Enquiry</button>
+      <p class="form-note" id="eq-status"></p>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
 <footer class="footer">
   <div class="footer-links">
     <a href="/data">Data & AI</a>
     <a href="/energy">Energy Upgrades</a>
     <a href="/gadgets">Gadgets</a>
+    <a href="https://www.linkedin.com/in/thomas-taresch/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="mailto:thomas.taresch@unwindai.com.au">Contact</a>
   </div>
-  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp; thomas.taresch@unwindai.com.au</p>
+  <p>© 2026 Unwind AI & Data Pty Ltd &nbsp;·&nbsp;
+    <button class="contact-reveal" id="reveal-phone" aria-label="Show phone number">📞 Show number</button>
+    &nbsp;·&nbsp;
+    <button class="contact-reveal" id="reveal-email" aria-label="Show email">✉ Show email</button>
+  </p>
 </footer>
 
 <script src="/js/chat.js"></script>
 <script>
-  new ChatWidget('energy-chat', '/api/chat', {
-    placeholder: 'Ask me about VEU energy upgrades and eligibility…'
+  var energyChat = new ChatWidget('energy-chat', '/api/chat', {
+    placeholder: 'Type here...',
+    darkMode: false,
+    autoGreet: true
+  });
+  energyChat._scheduleGreet = function() {
+    var self = this;
+    setTimeout(function() {
+      if (self._started || self._greetAborted) return;
+      self._typeGreet('Ask me anything — find out about VEU Energy Upgrades (Hot Water, HVAC Heating and Cooling, Home Energy Rating). Drop in a floor plan or describe your home and I\'ll tell you what you qualify for and roughly what you\'d pay.', 22);
+    }, 1200);
+  };
+
+  // Prompt chips
+  document.querySelectorAll('.prompt-chip').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      energyChat._input().value = this.dataset.prompt;
+      energyChat._syncBtn();
+      energyChat.send();
+    });
+  });
+
+  // Energy reviews carousel
+  (function() {
+    var track = document.getElementById('er-track');
+    var dotsEl = document.getElementById('er-dots');
+    var slides = track ? track.querySelectorAll('.testimonial-slide') : [];
+    if (!slides.length) return;
+    var current = 0, timer;
+    slides.forEach(function(_, i) {
+      var dot = document.createElement('button');
+      dot.className = 'testimonials-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Review ' + (i + 1));
+      dot.addEventListener('click', function() { go(i); });
+      dotsEl.appendChild(dot);
+    });
+    function go(n) {
+      var dots = dotsEl.querySelectorAll('.testimonials-dot');
+      dots[current].classList.remove('active');
+      current = ((n % slides.length) + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+      dots[current].classList.add('active');
+      clearInterval(timer);
+      timer = setInterval(function() { go(current + 1); }, 6000);
+    }
+    document.getElementById('er-prev').addEventListener('click', function() { go(current - 1); });
+    document.getElementById('er-next').addEventListener('click', function() { go(current + 1); });
+    timer = setInterval(function() { go(current + 1); }, 6000);
+  })();
+
+  // File input label
+  document.getElementById('eq-file').addEventListener('change', function() {
+    document.getElementById('eq-file-label').textContent = this.files[0] ? '📎 ' + this.files[0].name : 'No file chosen';
+  });
+
+  // Form submit — placeholder (wire up to API later)
+  document.getElementById('energy-enquiry-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('eq-submit');
+    var status = document.getElementById('eq-status');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    // TODO: wire to Resend / Google Sheets API
+    setTimeout(function() {
+      status.textContent = "Thanks! We'll be in touch within 24 hours.";
+      status.style.color = '#16a34a';
+      btn.textContent = 'Sent ✓';
+    }, 800);
+  });
+
+  // Contact reveal
+  document.getElementById('reveal-phone').addEventListener('click', function() {
+    var n = ['+61','476','905','033'].join(' ');
+    this.outerHTML = '<a href="tel:+61476905033" style="color:#60a5fa">' + n + '</a>';
+  });
+  document.getElementById('reveal-email').addEventListener('click', function() {
+    var e = 'thomas.taresch' + '@' + 'unwindai.com.au';
+    this.outerHTML = '<a href="mailto:' + e + '" style="color:#60a5fa">' + e + '</a>';
   });
 </script>
 

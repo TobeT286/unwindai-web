@@ -425,6 +425,281 @@ img { max-width: 100%; display: block; }
 .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 
+/* ── Markdown chat formatting ────────────────────────── */
+.chat-message--assistant .md-p { margin: 0.2rem 0; font-size: 0.88rem; line-height: 1.55; }
+.chat-message--assistant .md-gap { height: 0.4rem; }
+.chat-message--assistant .md-h3 { font-weight: 700; font-size: 0.9rem; margin: 0.4rem 0 0.1rem; }
+.chat-message--assistant .md-h4 { font-weight: 600; font-size: 0.85rem; margin: 0.3rem 0 0.1rem; }
+.chat-message--assistant .md-ul { margin: 0.3rem 0 0.3rem 1rem; padding: 0; }
+.chat-message--assistant .md-ul li { font-size: 0.88rem; line-height: 1.5; margin: 0.15rem 0; }
+.chat-message--assistant .md-code { background: #e2e8f0; border-radius: 3px; padding: 0 3px; font-size: 0.82rem; font-family: monospace; }
+
+/* ── Placeholder pulse animation ────────────────────── */
+@keyframes placeholderPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+.chat-input-row input::placeholder {
+  animation: placeholderPulse 2.5s ease-in-out infinite;
+}
+
+/* ── Voice button ───────────────────────────────────── */
+.chat-voice-btn {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; border: none; cursor: pointer;
+  background: transparent; color: rgba(255,255,255,0.55);
+  transition: color 0.15s, background 0.15s;
+}
+.chat-voice-btn:hover { color: rgba(255,255,255,0.9); }
+.chat-voice-btn.active { color: #f87171; background: rgba(248,113,113,0.15); }
+
+/* ── Lucide card icons ───────────────────────────────── */
+.card-icon-wrap {
+  width: 52px; height: 52px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1rem;
+}
+.card--data   .card-icon-wrap { background: #eff6ff; color: #1d4ed8; }
+.card--energy .card-icon-wrap { background: #f0fdf4; color: #16a34a; }
+.card--gadgets .card-icon-wrap { background: #f5f3ff; color: #7c3aed; }
+
+/* ── VEU Logo in energy nav ──────────────────────────── */
+.nav-veu {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.nav-veu-logo { height: 30px; width: auto; display: block; }
+.nav-veu-acc { font-size: 0.55rem; color: var(--c-muted); letter-spacing: 0.02em; }
+
+/* ── Energy page sections ────────────────────────────── */
+
+/* Reviews */
+.energy-reviews {
+  background: #f8faff; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+}
+.section-title {
+  text-align: center; font-size: 1.4rem; font-weight: 800;
+  margin-bottom: 0.5rem; color: var(--c-text);
+}
+.section-sub {
+  text-align: center; color: var(--c-muted); font-size: 0.9rem; margin-bottom: 1.5rem;
+}
+
+/* Offers / pricing */
+.offers-section {
+  background: #fff; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+}
+.offers-highlight {
+  background: linear-gradient(135deg, #052e16, #15803d);
+  color: #fff; border-radius: var(--radius);
+  padding: 1.25rem 1.5rem; text-align: center;
+  font-size: 1rem; line-height: 1.5; margin-bottom: 1.75rem;
+  max-width: 780px; margin-left: auto; margin-right: auto;
+}
+.offers-highlight strong { color: #86efac; }
+.offer-checklist {
+  list-style: none; max-width: 680px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.offer-checklist li {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  font-size: 0.95rem; line-height: 1.4;
+}
+.offer-checklist li::before {
+  content: '✓'; flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--c-green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; margin-top: 0.05rem;
+}
+.offer-checklist del { color: var(--c-muted); font-size: 0.85rem; }
+.offers-note {
+  text-align: center; font-size: 0.8rem; color: var(--c-muted);
+  margin-top: 1.25rem;
+}
+
+/* System product cards */
+.systems-section {
+  background: #f8faff; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+}
+.systems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem; max-width: 960px; margin: 0 auto;
+}
+.system-card {
+  background: #fff; border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 1.5rem;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+.system-brand {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c-muted);
+}
+.system-model { font-size: 1.1rem; font-weight: 800; color: var(--c-text); }
+.system-capacity {
+  display: inline-block; background: #eff6ff; color: #1d4ed8;
+  font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.6rem;
+  border-radius: 20px; align-self: flex-start;
+}
+.system-warranty {
+  font-size: 0.78rem; color: var(--c-muted);
+}
+.system-features {
+  display: flex; flex-direction: column; gap: 0.35rem; margin: 0.25rem 0;
+}
+.system-feat {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.82rem; color: var(--c-text);
+}
+.system-feat::before { content: '✓'; color: var(--c-green); font-weight: 700; }
+.system-efficiency { display: flex; gap: 2px; }
+.system-efficiency span {
+  display: inline-block; width: 12px; height: 12px; border-radius: 2px;
+  background: #22c55e;
+}
+.system-efficiency span.empty { background: #e2e8f0; }
+.system-apply {
+  margin-top: auto;
+  display: block; text-align: center;
+  background: var(--c-green); color: #fff;
+  padding: 0.6rem 1rem; border-radius: 8px;
+  font-weight: 700; font-size: 0.88rem; text-decoration: none;
+  transition: filter 0.15s;
+}
+.system-apply:hover { filter: brightness(1.08); }
+
+/* Enquiry form */
+.enquiry-section {
+  background: #fff; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--c-border);
+}
+.enquiry-form {
+  max-width: 660px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.enquiry-form label {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  font-size: 0.85rem; font-weight: 600; color: var(--c-text);
+}
+.enquiry-form input,
+.enquiry-form select,
+.enquiry-form textarea {
+  padding: 0.65rem 0.9rem; border-radius: 8px;
+  border: 1px solid var(--c-border); font-size: 0.9rem;
+  font-family: var(--font); color: var(--c-text);
+  background: #f8fafc; outline: none; transition: border-color 0.15s;
+}
+.enquiry-form input:focus,
+.enquiry-form select:focus,
+.enquiry-form textarea:focus { border-color: var(--c-primary); background: #fff; }
+.enquiry-form textarea { resize: vertical; min-height: 90px; }
+.enquiry-form .form-submit {
+  background: var(--c-green); color: #fff; border: none;
+  padding: 0.85rem 1.5rem; border-radius: 8px; font-size: 1rem;
+  font-weight: 700; cursor: pointer; font-family: var(--font);
+  transition: filter 0.15s; align-self: flex-start;
+}
+.enquiry-form .form-submit:hover { filter: brightness(1.08); }
+.form-success {
+  display: none; background: #f0fdf4; border: 1px solid #86efac;
+  border-radius: var(--radius); padding: 1rem 1.25rem;
+  color: #15803d; font-weight: 600; text-align: center;
+}
+
+/* ── Offers grid (energy page) ───────────────────────── */
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem; max-width: 960px; margin: 0 auto;
+}
+.offer-card {
+  background: #fff; border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 1.5rem;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 0.6rem;
+  position: relative;
+}
+.offer-card--featured {
+  border-color: var(--c-green);
+  box-shadow: 0 4px 20px rgba(22,163,74,0.15);
+}
+.offer-badge {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--c-green); color: #fff;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; border-radius: 20px; white-space: nowrap;
+}
+.offer-icon { font-size: 1.75rem; }
+.offer-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0; }
+.offer-price { font-size: 0.88rem; color: var(--c-muted); }
+.offer-price strong { color: var(--c-green); font-size: 1.1rem; }
+.offer-card .offer-checklist { margin: 0; max-width: none; gap: 0.5rem; }
+.offer-card .offer-checklist li { font-size: 0.82rem; }
+.offer-card .offer-checklist li::before {
+  width: 18px; height: 18px; font-size: 0.65rem;
+}
+
+/* ── System cards (energy page) ──────────────────────── */
+.system-card--featured {
+  border-color: var(--c-primary);
+  box-shadow: 0 4px 20px rgba(29,78,216,0.12);
+}
+.system-name { font-size: 1.15rem; font-weight: 800; color: var(--c-text); }
+.system-badge {
+  display: inline-block; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; border-radius: 20px; align-self: flex-start;
+}
+.system-badge--green  { background: #f0fdf4; color: #15803d; }
+.system-badge--blue   { background: #eff6ff; color: #1d4ed8; }
+.system-badge--purple { background: #f5f3ff; color: #7c3aed; }
+.system-specs {
+  list-style: none; display: flex; flex-direction: column; gap: 0.35rem;
+  border-top: 1px solid var(--c-border); padding-top: 0.6rem; margin-top: 0.2rem;
+}
+.system-specs li { display: flex; justify-content: space-between; font-size: 0.82rem; }
+.spec-label { color: var(--c-muted); }
+.spec-val { font-weight: 600; color: var(--c-text); text-align: right; }
+.system-features { font-size: 0.82rem; color: var(--c-muted); line-height: 1.5; }
+.system-cta {
+  margin-top: auto; display: block; text-align: center;
+  background: var(--c-green); color: #fff;
+  padding: 0.65rem 1rem; border-radius: 8px;
+  font-weight: 700; font-size: 0.88rem; text-decoration: none;
+  transition: filter 0.15s;
+}
+.system-cta:hover { filter: brightness(1.08); }
+
+/* ── Enquiry form groups ─────────────────────────────── */
+.form-group {
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.form-group label {
+  font-size: 0.85rem; font-weight: 600; color: var(--c-text);
+}
+.form-file-input { display: none; }
+.form-file-label {
+  font-size: 0.82rem; color: var(--c-muted);
+  background: #f8fafc; border: 1px solid var(--c-border);
+  border-radius: 8px; padding: 0.6rem 0.9rem; display: block; cursor: pointer;
+}
+.form-submit-btn {
+  background: var(--c-green); color: #fff; border: none;
+  padding: 0.85rem 2rem; border-radius: 8px; font-size: 1rem;
+  font-weight: 700; cursor: pointer; font-family: var(--font);
+  transition: filter 0.15s; align-self: flex-start;
+}
+.form-submit-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.form-submit-btn:disabled { opacity: 0.7; cursor: default; }
+.form-note { font-size: 0.85rem; min-height: 1.2rem; }
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 640px) {
   .hero { padding: 3.5rem 1rem 3rem; }
@@ -434,4 +709,7 @@ img { max-width: 100%; display: block; }
   .chat-widget { padding: 1rem; }
   .testimonial-slide { padding: 0 2.5rem; }
   .testimonial-card { padding: 1.5rem 1.25rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .nav-veu-acc { display: none; }
+  .systems-grid { grid-template-columns: 1fr; }
 }

@@ -29,7 +29,7 @@
   <div class="hero-top">
     <div class="hero-title-group">
       <h1>What do you need<br>help with?</h1>
-      <p class="hero-sub">Ask about data automation, energy upgrades, or gadgets — or request a free quote to see how we can save you money and time.</p>
+      <p class="hero-sub">Ask about our services — or request a free cost estimate to see how we can save you money and time.</p>
     </div>
     <div class="hero-prompts" id="hero-prompts">
       <button class="prompt-chip" data-prompt="Why would an SMSF make sense for me as a tradie running a Pty Ltd? What are the tax benefits of that structure?">💼 SMSF for tradies — tax benefits?</button>
@@ -47,42 +47,34 @@
     <div class="cards-grid">
       <a class="card card--data" href="/data">
         <div class="card-accent" style="background: linear-gradient(90deg, #1e3a8a, #3b82f6)"></div>
-        <div class="card-illustration card-illustration--data">
-          <div class="ci-screen">
-            <div class="ci-bar ci-bar--1"></div>
-            <div class="ci-bar ci-bar--2"></div>
-            <div class="ci-bar ci-bar--3"></div>
-          </div>
-          <div class="ci-bot">
-            <div class="ci-bot-head"></div>
-            <div class="ci-bot-bubble">AI</div>
-          </div>
+        <div class="card-icon-wrap">
+          <!-- Lucide: Database + network nodes -->
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 9v4c0 1.66 4 3 9 3s9-1.34 9-3V9"/><path d="M3 13v4c0 1.66 4 3 9 3s9-1.34 9-3v-4"/>
+          </svg>
         </div>
         <h3>Data Automation & AI Integration</h3>
-        <p>Custom data pipelines, Smartsheet & Alteryx solutions, and AI/ML systems. Built for Australian businesses that run on data.</p>
+        <p>AI Integration, Custom Data Pipelines, Data Platforms, Databases, Dashboards and more.</p>
       </a>
       <a class="card card--energy" href="/energy">
         <div class="card-accent" style="background: linear-gradient(90deg, #16a34a, #22c55e)"></div>
-        <div class="card-illustration card-illustration--energy">
-          <div class="ci-ac">
-            <div class="ci-ac-unit"></div>
-            <div class="ci-ac-vents"><span></span><span></span><span></span></div>
-          </div>
-          <div class="ci-badge">Save<br><strong>$000s</strong></div>
+        <div class="card-icon-wrap" style="background:transparent;padding:0;margin-bottom:0.5rem;">
+          <img src="/images/veu_logo.png" alt="VEU Accredited" style="height:44px;width:auto;object-fit:contain;">
         </div>
+        <p style="font-size:0.62rem;color:var(--c-muted);margin-bottom:0.5rem;">Accreditation No. AA003264</p>
         <h3>VEU Energy Upgrades</h3>
         <p>Is your Victorian home eligible for a government-subsidised energy upgrade? Check eligibility in 2 minutes.</p>
       </a>
       <a class="card card--gadgets" href="/gadgets">
         <div class="card-accent" style="background: linear-gradient(90deg, #7c3aed, #a78bfa)"></div>
-        <div class="card-illustration card-illustration--gadgets">
-          <div class="ci-coin ci-coin--1">$</div>
-          <div class="ci-coin ci-coin--2">$</div>
-          <div class="ci-coin ci-coin--3">$</div>
-          <div class="ci-clock">⏱</div>
+        <div class="card-icon-wrap">
+          <!-- Lucide: Wrench -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
         </div>
         <h3>Free Gadgets & Tools</h3>
-        <p>SMSF eligibility checker, bank statement summariser, and more. Free tools built by a data engineer who actually uses them.</p>
+        <p>Check out our free tools — Bank Statement Summariser, Invoice/Receipt Manager and Matcher, and SMSF Eligibility Checker.</p>
       </a>
     </div>
   </div>
@@ -96,23 +88,37 @@
       <div class="testimonials-track" id="t-track">
         <div class="testimonial-slide">
           <div class="testimonial-card">
-            <p class="testimonial-quote">We had our old split system replaced through UnwindAI's VEU program. The whole process took less than a week and we're saving over $400 a year on energy bills. Couldn't believe how straightforward it was.</p>
-            <p class="testimonial-author">Sarah M.</p>
-            <p class="testimonial-service">VEU Energy Upgrade · Pakenham, VIC</p>
+            <p class="testimonial-quote">Had our old gas ducted heater ripped out and a 3-head split system installed through the VEU scheme. The team was professional, clean and efficient — done in a day. We paid $1,000 out of pocket for a system worth over $7,000. Couldn't be happier.</p>
+            <p class="testimonial-author">James & Karen P.</p>
+            <p class="testimonial-service">Multi-head Split System · Berwick, VIC</p>
           </div>
         </div>
         <div class="testimonial-slide">
           <div class="testimonial-card">
-            <p class="testimonial-quote">Thomas built a pipeline that replaced 3 hours of daily manual data work. We haven't had to touch it in months — it just runs, every morning, without fail. Genuinely transformative for our team.</p>
+            <p class="testimonial-quote">Thomas built a pipeline that replaced 3 hours of daily manual data work. We haven't had to touch it in months — it just runs every morning without fail. The AI dashboard has completely changed how we make decisions.</p>
             <p class="testimonial-author">Rohan K.</p>
-            <p class="testimonial-service">Data Automation · Operations Manager, Melbourne</p>
+            <p class="testimonial-service">Data Automation & AI · Operations Manager, Melbourne</p>
           </div>
         </div>
         <div class="testimonial-slide">
           <div class="testimonial-card">
-            <p class="testimonial-quote">The free SMSF eligibility checker gave me clear answers in minutes. Saved me a $300+ consultation fee and I walked into my planner knowing exactly where I stood.</p>
+            <p class="testimonial-quote">Got our old gas hot water system removed and a heat pump installed under the VEU program. The difference in our energy bills has been incredible — and the whole experience from the website chat to installation day was seamless.</p>
+            <p class="testimonial-author">Lisa R.</p>
+            <p class="testimonial-service">Heat Pump Hot Water · Frankston, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">The SMSF eligibility checker gave me clear answers in minutes and saved me a $300+ consultation fee. I walked into my financial planner appointment knowing exactly where I stood. Brilliant free tool.</p>
             <p class="testimonial-author">David T.</p>
             <p class="testimonial-service">Free Tools · Melbourne, VIC</p>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">Single split system for the master bedroom — cool in summer, warm in winter. Paid $200 out of pocket through the VEU rebate. The whole install took 3 hours and the team left everything spotless. Highly recommend.</p>
+            <p class="testimonial-author">Aisha M.</p>
+            <p class="testimonial-service">Single Split System · Dandenong, VIC</p>
           </div>
         </div>
       </div>
@@ -142,7 +148,7 @@
 <script src="/js/chat.js"></script>
 <script>
   var homeChat = new ChatWidget('homepage-chat', '/api/chat', {
-    placeholder: 'Ask about data automation, energy upgrades, gadgets and tools…'
+    placeholder: 'Type here...'
   });
 
   // Prompt chip clicks — fill input and send immediately
