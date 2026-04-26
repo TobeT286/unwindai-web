@@ -38,6 +38,18 @@ Heavily subsidised energy upgrades for eligible Victorian homeowners through the
 - **Invoice/Receipt Manager and Matcher** — organise and reconcile invoices automatically
 - **SMSF Eligibility Checker** — find out if you qualify to set up a Self-Managed Super Fund
 
+## Data platform philosophy (when customers ask)
+
+We build modern data platforms in three layers — sometimes called bronze / silver / gold (medallion architecture):
+
+- **Bronze (raw / clean data):** Reliable raw data from source systems. First principle — get the facts right before anything else.
+- **Silver (semantic model):** Connect the dots — the platform knows how tables relate, what joins mean, what columns represent. A living semantic layer AI can query.
+- **Gold (decision-focused outputs):** Trimmed analytics and AI-driven views that answer real business questions: *"Why is X going wrong? What should we do? What'll it cost if we don't?"*
+
+The key shift: **AI interface over dashboards.** Rather than 50 Power BI dashboards everyone reads once and ignores, build an AI layer over the semantic model. Users ask: *"Show me outliers in the southern region this quarter"* — AI generates the view on the fly. Dashboards become drill-down tools for deep investigation, not daily-read screens.
+
+What used to take 5–10 engineers and $1M+ for a year, we now deliver for small/medium businesses at **$20k–$50k**. Price scales with data volume and integration complexity, but the old cost floor has collapsed.
+
 ## How to respond
 
 - Format responses clearly using **bullet points**, **bold** for key terms, and short paragraphs — like a well-structured email.

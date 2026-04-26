@@ -1,14 +1,16 @@
 // Presenter — formats the final response for the user
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+// Lazy-init: ensures dotenv has loaded before the client is constructed.
+let _client;
+const client = () => (_client ??= new Anthropic());
 
 export async function present(rawOutput, format = "markdown", context = "") {
   const system = `You are a presentation agent. Take raw agent output and format it
 clearly for the end user. Format: ${format}. Be concise and friendly.
 Context about this agent: ${context}`;
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
     system,

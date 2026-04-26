@@ -1,14 +1,15 @@
 // Doer — executes a single step from the planner's plan
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+let _client;
+const client = () => (_client ??= new Anthropic());
 
 export async function execute(step, contextData = {}) {
   const system = `You are an execution agent. Carry out the given step precisely.
 Use any provided context data. Return the result as plain text or JSON.
 Context data: ${JSON.stringify(contextData)}`;
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 2048,
     system,

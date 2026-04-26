@@ -1,6 +1,7 @@
-// Tool Operator — handles all external API calls (Sheets, Calendar, Python scripts)
+// Tool Operator — handles all external API calls (Sheets, Calendar, Email, Python scripts)
 import { execFile } from "child_process";
 import { promisify } from "util";
+import { readInbox, summariseEmails } from "./email-reader.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -8,6 +9,7 @@ const execFileAsync = promisify(execFile);
 const TOOLS = {
   sheets: callSheets,
   calendar: callCalendar,
+  email: callEmail,
   python: runPython,
 };
 
@@ -15,6 +17,19 @@ export async function callTool(toolName, params = {}) {
   const tool = TOOLS[toolName];
   if (!tool) throw new Error(`Unknown tool: ${toolName}`);
   return tool(params);
+}
+
+async function callEmail({ account = "unwindai", action = "list", days = 7, mailbox = "INBOX", search } = {}) {
+  if (action === "list") {
+    const messages = await readInbox({ account, days, mailbox, search });
+    return { source: "email", account, count: messages.length, messages };
+  }
+  if (action === "summarise") {
+    const messages = await readInbox({ account, days, mailbox, search });
+    const summary = await summariseEmails(messages);
+    return { source: "email", account, count: messages.length, summary };
+  }
+  throw new Error(`Unknown email action: ${action}`);
 }
 
 async function callSheets({ sheetId, range, values, action = "read" }) {

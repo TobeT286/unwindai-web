@@ -1,8 +1,15 @@
-// Router — determines which agent flow handles a given request
+// Router — determines which agent flow handles a given request.
+// Order matters: more specific routes first. The data-engineer route catches
+// internal/technical platform-design questions; the data route catches
+// customer-facing pitch questions.
 const ROUTES = {
   aimaster: {
     keywords: ["ai tool", "ai trend", "latest ai", "new model", "agent framework", "llm", "how should i use ai", "best ai", "ai for business", "ai revenue", "automate with ai"],
     contextKey: "ai-master",
+  },
+  "data-engineer": {
+    keywords: ["data engineer", "data engineering", "platform design", "platform architecture", "medallion", "bronze silver gold", "lakehouse", "dbt", "airflow", "prefect", "dagster", "data warehouse", "iceberg", "delta lake", "kafka", "spark", "orchestration", "semantic layer", "data quality"],
+    contextKey: "data-engineer",
   },
   energy: {
     keywords: ["energy", "solar", "battery", "power", "electricity", "tariff", "grid"],

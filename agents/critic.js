@@ -1,7 +1,8 @@
 // Critic — reviews doer output before it reaches the user
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+let _client;
+const client = () => (_client ??= new Anthropic());
 
 export async function critique(output, originalIntent, context = "") {
   const system = `You are a quality critic. Review the given output against the original user intent.
@@ -9,7 +10,7 @@ Check for: accuracy, completeness, tone, and relevance.
 Return JSON: { "approved": true|false, "issues": ["..."], "revised": "revised output or null" }
 Context: ${context}`;
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
     system,

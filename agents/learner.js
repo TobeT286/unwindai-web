@@ -6,12 +6,15 @@ import { fileURLToPath } from "url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const CONTEXT_MAP = {
+  "ai-master": "ai-master.md",
+  "data-engineer": "data-engineer.md",
   energy: "energy-agent.md",
   amh: "amh-agent.md",
   data: "data-agent.md",
   maintenance: "maintenance-agent.md",
   spoton: "spoton-electrical.md",
   thomas: "thomas-context.md",
+  general: "thomas-context.md",
 };
 
 export async function loadContext(agentKey) {

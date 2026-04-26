@@ -3,11 +3,16 @@ import { readFile } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
+import { config as loadDotenv } from "dotenv";
 import { supervise } from "../supervisor.js";
 import { present } from "../presenter.js";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
-const client = new Anthropic();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, "../..");
+loadDotenv({ path: join(ROOT, "..", "data-pipeline", ".env"), override: true });
+
+let _client;
+const client = () => (_client ??= new Anthropic());
 
 async function loadContext() {
   const base = await readFile(join(ROOT, "context", "ai-master.md"), "utf-8");
@@ -28,7 +33,7 @@ async function loadContext() {
 export async function runAIMasterFlow(userMessage) {
   const context = await loadContext();
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 2048,
     system: context,
