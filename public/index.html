@@ -32,9 +32,9 @@
       <p class="hero-sub">Ask about our services — or request a free cost estimate to see how we can save you money and time.</p>
     </div>
     <div class="hero-prompts" id="hero-prompts">
-      <button class="prompt-chip" data-prompt="Why would an SMSF make sense for me as a tradie running a Pty Ltd? What are the tax benefits of that structure?">💼 SMSF for tradies — tax benefits?</button>
+      <button class="prompt-chip prompt-chip--featured" data-prompt="What are typical AI integrations for an SME business — especially for tradies running a Pty Ltd? What is trending right now?">🔥 AI Integration for SME business <span class="chip-tag">Trending for Tradies</span></button>
       <button class="prompt-chip" data-prompt="How much does a data platform cost for a business with 20 people and 3 main databases around 100GB?">📊 Data platform cost for 20 people?</button>
-      <button class="prompt-chip" data-prompt="Based on a typical floorplan and a reverse cycle system from a leading brand, what are the rough costs including installation?">❄️ Reverse cycle costs for my home?</button>
+      <button class="prompt-chip" data-prompt="VEU Energy Upgrades — what are Unwindai GoGreen services?">❄️ VEU Energy Upgrades — Unwindai GoGreen?</button>
     </div>
   </div>
   <div class="chat-widget" id="homepage-chat"></div>
@@ -146,9 +146,18 @@
 </footer>
 
 <script src="/js/chat.js"></script>
+<script src="/js/contact.js"></script>
 <script>
   var homeChat = new ChatWidget('homepage-chat', '/api/chat', {
-    placeholder: 'Type here...'
+    placeholder: 'Type here...',
+    greeting: 'Ask me anything — what brought you to visit our homepage today?',
+    idleMessage:
+      'Unwindai has 3 divisions:\n\n' +
+      '- **[Data & AI](/data)** — Data Platforms, Pipelines & AI Integration for businesses.\n' +
+      '- **[Unwindai GoGreen](/energy)** — Free VEU energy upgrades for Victorian homeowners.\n' +
+      '- **[Gadgets](/gadgets)** — Free tools: bank-statement summariser, invoice matcher, SMSF checker.\n\n' +
+      'Which one is most relevant for you?',
+    idleDelay: 15000
   });
 
   // Prompt chip clicks — fill input and send immediately

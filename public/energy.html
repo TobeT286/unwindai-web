@@ -11,7 +11,7 @@
 
 <nav class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="/"><img src="/images/logo.jpg" alt="UnwindAI" class="nav-logo-img"></a>
+    <a class="nav-logo" href="/"><img src="/images/logo_green.png" alt="UnwindAI GoGreen" class="nav-logo-img"></a>
     <div class="nav-veu">
       <img src="/images/veu_logo.png" alt="VEU Accredited" class="nav-veu-logo">
       <span class="nav-veu-acc">Accreditation No. AA003264</span>
@@ -38,7 +38,20 @@
       <button class="prompt-chip" data-prompt="My 4-bedroom home has no air conditioning at all. What multi-head or ducted system can I get through the VEU program and what would I pay?">❄️ Add cooling to my whole home?</button>
     </div>
   </div>
-  <div class="chat-widget chat-widget--dark" id="energy-chat"></div>
+  <div class="hero-split">
+    <div class="chat-widget chat-widget--dark" id="energy-chat"></div>
+    <form class="hero-form" id="energy-quick-form">
+      <h3 class="hero-form-title">Free Eligibility Check</h3>
+      <p class="hero-form-sub">Or fill in your details and we'll come back to you within 24 hours.</p>
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="tel" name="phone" placeholder="Phone (optional)">
+      <input type="text" name="suburb" placeholder="Suburb / postcode" required>
+      <textarea name="message" rows="3" placeholder="Briefly: what would you like upgraded?"></textarea>
+      <button type="submit" class="hero-form-btn">Send My Enquiry</button>
+      <p class="hero-form-status" id="hf-status"></p>
+    </form>
+  </div>
 </section>
 
 <!-- What's on Offer -->
@@ -283,19 +296,20 @@
 </footer>
 
 <script src="/js/chat.js"></script>
+<script src="/js/contact.js"></script>
 <script>
   var energyChat = new ChatWidget('energy-chat', '/api/chat', {
     placeholder: 'Type here...',
-    darkMode: false,
-    autoGreet: true
+    greeting: 'Ask me anything — find out about VEU Energy Upgrades. Drop in a floor plan or describe your home and I\'ll tell you what you qualify for and roughly what you\'d pay.',
+    idleMessage:
+      '**Unwindai GoGreen — what we do:**\n\n' +
+      '- We replace gas hot water and gas heaters.\n' +
+      '- We install Heating & Cooling Heat Pump Systems.\n' +
+      '- We provide Home Energy Assessments.\n\n' +
+      'Want a free eligibility check? Fill in the form on the right or just tell me about your home below.',
+    idleDelay: 5000,
+    typeSpeed: 14
   });
-  energyChat._scheduleGreet = function() {
-    var self = this;
-    setTimeout(function() {
-      if (self._started || self._greetAborted) return;
-      self._typeGreet('Ask me anything — find out about VEU Energy Upgrades (Hot Water, HVAC Heating and Cooling, Home Energy Rating). Drop in a floor plan or describe your home and I\'ll tell you what you qualify for and roughly what you\'d pay.', 22);
-    }, 1200);
-  };
 
   // Prompt chips
   document.querySelectorAll('.prompt-chip').forEach(function(btn) {
@@ -333,6 +347,18 @@
     document.getElementById('er-next').addEventListener('click', function() { go(current + 1); });
     timer = setInterval(function() { go(current + 1); }, 6000);
   })();
+
+  // Hero quick-form submit (placeholder — wire to /api/contact later)
+  document.getElementById('energy-quick-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = this.querySelector('.hero-form-btn');
+    var status = document.getElementById('hf-status');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    setTimeout(function() {
+      status.textContent = "Thanks! We'll be in touch within 24 hours.";
+      btn.textContent = 'Sent ✓';
+    }, 800);
+  });
 
   // File input label
   document.getElementById('eq-file').addEventListener('change', function() {

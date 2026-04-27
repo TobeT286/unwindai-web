@@ -5,6 +5,11 @@ class ChatWidget {
     this.apiEndpoint = apiEndpoint;
     this.placeholder = options.placeholder || 'Type here...';
     this.darkMode = options.darkMode || false;
+    this.greeting = options.greeting || 'Ask me anything — what brought you to visit our homepage today?';
+    this.greetDelay = options.greetDelay != null ? options.greetDelay : 1000;
+    this.typeSpeed = options.typeSpeed || 12;
+    this.idleMessage = options.idleMessage || null;
+    this.idleDelay = options.idleDelay != null ? options.idleDelay : 15000;
     this.messages = [];
     this.busy = false;
     this.pendingFile = null;
@@ -25,7 +30,7 @@ class ChatWidget {
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         </label>
         <span class="chat-attach-name" id="${id}-fname"></span>
-        <input type="text" id="${id}-input" placeholder="${this.placeholder}" autocomplete="off"/>
+        <textarea id="${id}-input" placeholder="${this.placeholder}" rows="1" autocomplete="off"></textarea>
         <button id="${id}-send" type="button" class="chat-send-btn" disabled aria-label="Send message">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
@@ -33,10 +38,20 @@ class ChatWidget {
     `;
     const input = this._input();
     input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } });
-    input.addEventListener('input', () => this._syncBtn());
+    input.addEventListener('input', () => {
+      this._syncBtn();
+      this._autosize();
+      if (this._idleTimer) { clearTimeout(this._idleTimer); this._idleTimer = null; }
+    });
     this._btn().addEventListener('click', () => this.send());
     document.getElementById(`${id}-file`).addEventListener('change', e => this._handleFile(e.target.files[0]));
     this._addVoiceBtn();
+  }
+
+  _autosize() {
+    const el = this._input();
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
   }
 
   _addVoiceBtn() {
@@ -88,12 +103,18 @@ class ChatWidget {
   _scheduleGreet() {
     setTimeout(() => {
       if (this._started || this._greetAborted) return;
-      this._typeGreet('Ask me anything — our services range from Data Platforms, Data Process Automations, AI and ML Integration Solutions and Services to VEU Energy Upgrades. We also build custom tools and gadgets to help with your daily churn. You can attach a floor plan, property contract, or PDF and I\'ll review it for you.', 24);
-    }, 1200);
+      this._typeGreet(this.greeting, this.typeSpeed, () => {
+        if (!this.idleMessage) return;
+        this._idleTimer = setTimeout(() => {
+          if (this._started || this._greetAborted) return;
+          this._typeGreet(this.idleMessage, Math.max(8, this.typeSpeed - 2));
+        }, this.idleDelay);
+      });
+    }, this.greetDelay);
   }
 
-  _typeGreet(fullText, delayMs) {
-    const el = this._appendMessage('thinking', '');
+  _typeGreet(fullText, delayMs, onDone) {
+    const el = this._appendMessage('assistant-typing', '');
     let i = 0;
     const tick = () => {
       if (this._greetAborted) { el.remove(); return; }
@@ -104,6 +125,7 @@ class ChatWidget {
       } else {
         el.className = 'chat-message chat-message--assistant';
         el.innerHTML = this._renderMarkdown(el.textContent);
+        if (onDone) onDone();
       }
     };
     tick();
@@ -117,6 +139,7 @@ class ChatWidget {
     if (!this._started) {
       this._started = true;
       this._greetAborted = true;
+      if (this._idleTimer) clearTimeout(this._idleTimer);
       this._expand();
     }
 
@@ -207,7 +230,14 @@ class ChatWidget {
   // Simple markdown → safe HTML renderer
   _renderMarkdown(raw) {
     const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const safeUrl = u => /^(https?:\/\/|mailto:|tel:|\/)/i.test(u) ? u : '#';
     const inline = s => s
+      // [text](url) — markdown links. Mark as external if starts with http(s).
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, txt, url) => {
+        const u = safeUrl(url);
+        const ext = /^https?:\/\//i.test(u) ? ' target="_blank" rel="noopener"' : '';
+        return '<a class="md-link" href="' + u + '"' + ext + '>' + txt + '</a>';
+      })
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/`(.+?)`/g, '<code class="md-code">$1</code>');
