@@ -65,14 +65,28 @@
     }
     bindTriggers(document);
 
-    // Submit (placeholder — wire to /api/contact later)
-    form.addEventListener('submit', function(e) {
+    // Submit → POST /api/contact (emails info@unwindai.com.au)
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       var btn = form.querySelector('.contact-modal-btn');
       btn.disabled = true; btn.textContent = 'Sending…';
-      status.textContent = '';
-      // TODO: POST to /api/contact when endpoint exists
-      setTimeout(function() {
+      status.style.color = ''; status.textContent = '';
+      var fd = new FormData(form);
+      var payload = {
+        name: fd.get('name'),
+        email: fd.get('email'),
+        question: fd.get('question'),
+      };
+      try {
+        var res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          var err = await res.json().catch(function() { return {}; });
+          throw new Error(err.error || ('Server error ' + res.status));
+        }
         status.textContent = "Thanks! We'll be in touch within 24 hours.";
         btn.textContent = 'Sent ✓';
         setTimeout(function() {
@@ -81,7 +95,11 @@
           btn.disabled = false; btn.textContent = 'Send';
           status.textContent = '';
         }, 1400);
-      }, 700);
+      } catch (err) {
+        status.style.color = '#dc2626';
+        status.textContent = 'Something went wrong — please email info@unwindai.com.au directly.';
+        btn.disabled = false; btn.textContent = 'Send';
+      }
     });
 
     window.openContactModal = open;

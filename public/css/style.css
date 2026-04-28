@@ -35,7 +35,7 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo { text-decoration: none; display: flex; align-items: center; }
-.nav-logo-img { height: 36px; width: auto; display: block; }
+.nav-logo-img { height: 43px; width: auto; display: block; }
 .nav-links { display: flex; gap: 1.5rem; list-style: none; }
 .nav-links a {
   text-decoration: none; color: #334155;
@@ -46,7 +46,7 @@ img { max-width: 100%; display: block; }
 /* ── Hero ───────────────────────────────────────────── */
 .hero {
   background: var(--gradient-hero);
-  padding: 2.5rem 1.5rem 1.75rem;
+  padding: 2.5rem 1.5rem 0.75rem;
   text-align: center; color: #fff;
   position: relative; overflow: hidden;
 }
@@ -129,11 +129,16 @@ img { max-width: 100%; display: block; }
   text-align: left;
 }
 .chat-messages {
-  min-height: 60px; max-height: 300px;
-  overflow-y: auto; margin-bottom: 0.75rem;
+  min-height: 60px; max-height: min(560px, 70vh);
+  overflow-y: auto; overscroll-behavior: contain;
+  margin-bottom: 0.75rem;
   display: flex; flex-direction: column; gap: 0.5rem;
   justify-content: flex-end;
+  scrollbar-width: thin;
 }
+.chat-messages::-webkit-scrollbar { width: 8px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.35); border-radius: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
 .chat-message {
   padding: 0.6rem 0.9rem; border-radius: 8px;
   font-size: 0.9rem; line-height: 1.55; max-width: 88%;
@@ -283,7 +288,7 @@ img { max-width: 100%; display: block; }
 
 /* ── Service Cards ──────────────────────────────────── */
 .services {
-  padding: 2rem 1.5rem;
+  padding: 1rem 1.5rem 2rem;
   background: var(--c-surface);
 }
 .services-title {
@@ -304,12 +309,14 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius); padding: 1.25rem;
   box-shadow: var(--shadow); cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
-  text-decoration: none; color: inherit; display: block;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-.card-accent { height: 4px; border-radius: 2px; margin-bottom: 1.25rem; }
+.card-accent { height: 4px; border-radius: 2px; margin-bottom: 1.25rem; align-self: stretch; }
 .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
 .card p { font-size: 0.875rem; color: var(--c-muted); line-height: 1.55; }
+.card .card-bullets { text-align: left; align-self: stretch; }
 
 /* ── Card Illustrations ──────────────────────────────── */
 .card-illustration {
@@ -539,7 +546,11 @@ img { max-width: 100%; display: block; }
 .card-icon-wrap {
   width: 52px; height: 52px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
+}
+.card-icon-wrap--logo {
+  width: auto; height: auto; background: transparent !important;
+  padding: 0; margin: 0 auto 0.6rem;
 }
 .card--data   .card-icon-wrap { background: #eff6ff; color: #1d4ed8; }
 .card--energy .card-icon-wrap { background: #f0fdf4; color: #16a34a; }
@@ -607,7 +618,7 @@ img { max-width: 100%; display: block; }
 .nav-veu {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
-.nav-veu-logo { height: 30px; width: auto; display: block; }
+.nav-veu-logo { height: 36px; width: auto; display: block; }
 .nav-veu-acc { font-size: 0.55rem; color: var(--c-muted); letter-spacing: 0.02em; }
 
 /* ── Energy page sections ────────────────────────────── */

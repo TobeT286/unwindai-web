@@ -1,7 +1,9 @@
 {
   "version": 2,
   "functions": {
-    "api/chat.js": { "maxDuration": 60, "includeFiles": "context/**" }
+    "api/chat.js": { "maxDuration": 60, "includeFiles": "context/**" },
+    "api/contact.js": { "maxDuration": 10 },
+    "api/enquiry.js": { "maxDuration": 10 }
   },
   "routes": [
     { "src": "/energy", "dest": "/energy.html" },

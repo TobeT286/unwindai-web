@@ -222,7 +222,7 @@ class ChatWidget {
 
   _expand() {
     const msgs = this._messages();
-    if (msgs) msgs.style.maxHeight = '380px';
+    if (msgs) msgs.style.maxHeight = 'min(620px, 75vh)';
     const hero = document.getElementById('hero-section');
     if (hero) hero.classList.add('hero--chatting');
   }

@@ -348,16 +348,32 @@
     timer = setInterval(function() { go(current + 1); }, 6000);
   })();
 
-  // Hero quick-form submit (placeholder — wire to /api/contact later)
-  document.getElementById('energy-quick-form').addEventListener('submit', function(e) {
+  // Hero quick-form submit → /api/enquiry
+  document.getElementById('energy-quick-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var btn = this.querySelector('.hero-form-btn');
     var status = document.getElementById('hf-status');
     btn.disabled = true; btn.textContent = 'Sending…';
-    setTimeout(function() {
+    status.style.color = ''; status.textContent = '';
+    var fd = new FormData(this);
+    var payload = {
+      name: fd.get('name'), email: fd.get('email'),
+      phone: fd.get('phone'), suburb: fd.get('suburb'),
+      message: fd.get('message'), source: 'energy hero quick form',
+    };
+    try {
+      var res = await fetch('/api/enquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Server error ' + res.status);
       status.textContent = "Thanks! We'll be in touch within 24 hours.";
       btn.textContent = 'Sent ✓';
-    }, 800);
+    } catch (err) {
+      status.style.color = '#fca5a5';
+      status.textContent = 'Something went wrong — please email info@unwindai.com.au directly.';
+      btn.disabled = false; btn.textContent = 'Send My Enquiry';
+    }
   });
 
   // File input label
@@ -365,19 +381,34 @@
     document.getElementById('eq-file-label').textContent = this.files[0] ? '📎 ' + this.files[0].name : 'No file chosen';
   });
 
-  // Form submit — placeholder (wire up to API later)
-  document.getElementById('energy-enquiry-form').addEventListener('submit', function(e) {
+  // Full enquiry form → /api/enquiry
+  document.getElementById('energy-enquiry-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var btn = document.getElementById('eq-submit');
     var status = document.getElementById('eq-status');
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-    // TODO: wire to Resend / Google Sheets API
-    setTimeout(function() {
-      status.textContent = "Thanks! We'll be in touch within 24 hours.";
+    btn.disabled = true; btn.textContent = 'Sending…';
+    status.style.color = ''; status.textContent = '';
+    var fd = new FormData(this);
+    var payload = {
+      name: fd.get('name'), email: fd.get('email'),
+      phone: fd.get('phone'), suburb: fd.get('suburb'),
+      upgrade: fd.get('upgrade'), existing: fd.get('existing'),
+      message: fd.get('message'), source: 'energy full enquiry form',
+    };
+    try {
+      var res = await fetch('/api/enquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Server error ' + res.status);
       status.style.color = '#16a34a';
+      status.textContent = "Thanks! We'll be in touch within 24 hours.";
       btn.textContent = 'Sent ✓';
-    }, 800);
+    } catch (err) {
+      status.style.color = '#dc2626';
+      status.textContent = 'Something went wrong — please email info@unwindai.com.au directly.';
+      btn.disabled = false; btn.textContent = 'Send My Enquiry';
+    }
   });
 
   // Contact reveal

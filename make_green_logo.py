@@ -27,14 +27,14 @@ for y in range(h):
             continue
         hh, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         if LO <= hh <= HI:
-            # Preserve relative position within the blue band so the gradient
-            # is preserved as a gradient in green (lighter cyan -> lighter green).
+            # Preserve relative position within the blue band so the gradient is
+            # preserved in green (lighter cyan -> lighter green, deep blue -> deep emerald).
             t = (hh - LO) / (HI - LO)  # 0..1, low=cyan, high=deep blue
-            # Map to green band: 0.32 (lighter/yellow-green) .. 0.40 (deeper green)
-            new_h = 0.30 + (1 - t) * 0.05  # invert so cyan->yellower green, deep blue->emerald
-            # Slightly bump saturation for vibrancy
-            new_s = min(1.0, s * 1.05)
-            nr, ng, nb = colorsys.hsv_to_rgb(new_h, new_s, v)
+            # Darker forest-green band matching VEU page background (#052e16 -> #15803d).
+            new_h = 0.36 + (1 - t) * 0.02
+            new_s = min(1.0, s * 1.10)
+            new_v = v * (0.55 + 0.15 * (1 - t))  # darker overall, deepest at high-blue end
+            nr, ng, nb = colorsys.hsv_to_rgb(new_h, new_s, new_v)
             px[x, y] = (int(nr * 255), int(ng * 255), int(nb * 255), a)
 
 img.save(DST, "PNG")
