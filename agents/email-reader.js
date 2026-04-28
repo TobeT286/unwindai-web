@@ -1,11 +1,11 @@
 // Email Reader — IMAP-based Gmail reader using App Passwords (no OAuth, no Google Cloud).
 //
 // Env vars (master .env at ../data-pipeline/.env):
-//   GMAIL_PRIVATE_ADDRESS,  GMAIL_PRIVATE_APP_PASSWORD     — personal account
-//   GMAIL_UNWINDAI_ADDRESS, GMAIL_UNWINDAI_APP_PASSWORD    — unwindai.com.au account
-//   (Falls back to legacy GMAIL_ADDRESS / GMAIL_APP_PASSWORD if the per-account vars
-//    aren't set — supports the existing master .env until Thomas generates the second
-//    App Password.)
+//   GMAIL_ADDRESS,           GMAIL_APP_PASSWORD           — private account (thomas.taresch@gmail.com)
+//   GMAIL_ADDRESS_UNWINDAI,  GMAIL_APP_PASSWORD_UNWINDAI  — unwindai account (thomas.taresch@unwindai.com.au)
+//
+// Naming convention: <BASE>_<ACCOUNT_SUFFIX>. Private has no suffix (it's the default).
+// Add more accounts by adding GMAIL_ADDRESS_<NAME> + GMAIL_APP_PASSWORD_<NAME>.
 //
 // Public API:
 //   readInbox({ account, days = 7, mailbox = "INBOX", search })
@@ -27,26 +27,20 @@ loadDotenv({ path: MASTER_ENV, override: true });
 const anthropic = new Anthropic();
 
 function credsFor(account) {
-  if (account === "private") {
-    return {
-      user: process.env.GMAIL_PRIVATE_ADDRESS  || process.env.GMAIL_ADDRESS,
-      pass: process.env.GMAIL_PRIVATE_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD,
-    };
-  }
-  if (account === "unwindai") {
-    return {
-      user: process.env.GMAIL_UNWINDAI_ADDRESS  || process.env.GMAIL_ADDRESS,
-      pass: process.env.GMAIL_UNWINDAI_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD,
-    };
-  }
-  throw new Error(`Unknown account: ${account}. Use "private" or "unwindai".`);
+  // Private = no suffix (the default). Other accounts use _<NAME> suffix.
+  const suffix = account === "private" ? "" : `_${account.toUpperCase()}`;
+  return {
+    user: process.env[`GMAIL_ADDRESS${suffix}`],
+    pass: process.env[`GMAIL_APP_PASSWORD${suffix}`],
+  };
 }
 
 export async function readInbox({ account, days = 7, mailbox = "INBOX", search } = {}) {
   const { user, pass } = credsFor(account);
   if (!user || !pass) {
+    const suffix = account === "private" ? "" : `_${account.toUpperCase()}`;
     throw new Error(
-      `Missing IMAP creds for account="${account}". Set GMAIL_${account.toUpperCase()}_ADDRESS and GMAIL_${account.toUpperCase()}_APP_PASSWORD in master .env.`
+      `Missing IMAP creds for account="${account}". Set GMAIL_ADDRESS${suffix} and GMAIL_APP_PASSWORD${suffix} in master .env.`
     );
   }
 

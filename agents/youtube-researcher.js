@@ -31,12 +31,16 @@ const DAYS_BACK = 30;
 const MAX_VIDEOS_PER_CHANNEL = 5;
 const MAX_TRANSCRIPT_CHARS = 8_000;
 
-// Channel handles — resolved to IDs once, then cached
+// Channel sources. Each entry must have `label` and either `handle` (the @name)
+// or `channelId` (UC…). Use channelId when the @handle has been claimed by a
+// different channel — e.g. the real Teacher's Tech doesn't own @TeachersTech.
 const TARGET_CHANNELS = [
-  { handle: "IBMTechnology", label: "IBM Technology" },
-  { handle: "nateherk",      label: "Nate Herk" },
-  { handle: "AIFoundersHQ",  label: "AI Founders" },
-  // Thomas — append more @handles here as you find them
+  { handle: "IBMTechnology",                label: "IBM Technology" },
+  { handle: "nateherk",                     label: "Nate Herk" },
+  { handle: "AIFoundersHQ",                 label: "AI Founders" },
+  { handle: "DieAIStube",                   label: "Die AI Stube" },
+  { channelId: "UCO66zvpQorlNfs_7hFCfmaw",  label: "Teacher's Tech" },
+  // Thomas — append more entries here. Prefer channelId if you already have it.
 ];
 
 // ─── channel ID resolution (HTML scrape, cached) ────────────────────────────
@@ -137,10 +141,12 @@ async function run() {
   const cache = await loadChannelIdCache();
   const allSummaries = [];
 
-  for (const { handle, label } of TARGET_CHANNELS) {
+  for (const entry of TARGET_CHANNELS) {
+    const { handle, channelId: directId, label } = entry;
     try {
-      console.log(`  Resolving channel: ${label} (@${handle})`);
-      const channelId = await resolveChannelId(handle, cache);
+      const tag = handle ? `@${handle}` : `id:${directId.slice(0, 12)}…`;
+      console.log(`  Resolving channel: ${label} (${tag})`);
+      const channelId = directId ?? await resolveChannelId(handle, cache);
 
       const videos = (await fetchChannelRss(channelId))
         .filter((v) => v.videoId && withinWindow(v.published, DAYS_BACK))
@@ -155,7 +161,7 @@ async function run() {
         console.log(`  ✓ ${summary.title.slice(0, 60)}…`);
       }
     } catch (err) {
-      console.warn(`  ⚠ @${handle} failed: ${err.message}`);
+      console.warn(`  ⚠ ${label} failed: ${err.message}`);
     }
   }
 
