@@ -92,34 +92,62 @@ real (not placeholder) functionality.
 
 ---
 
-### Phase 2: Form intelligence (current → AI-routed intake)
+### Phase 2: Form intelligence (current → AI-routed intake) — **IN PROGRESS**
 
 **Why:** the email-only flow loses signal. AI can categorise, prioritise, and
-write to Sheets/DuckDB without you doing manual data entry on every lead.
+write to Sheets/DuckDB without manual data entry on every lead.
 
-**Architecture:** `/api/intake` becomes an AI router. Forms POST here in
-parallel with the existing email endpoint (email = always-on safety net).
-The intake agent:
+**Architecture:** `/api/intake` is an AI router. Forms POST here. The intake
+agent:
 
-1. Reads the form payload as a structured intake message
-2. Calls tools: `categorise_lead`, `save_to_sheet`, `save_to_duckdb`, `draft_reply`
-3. Returns success — the email-fallback already fired, so worst case is no
-   AI enrichment, never a lost lead
+1. Reads the form payload as a structured intake message wrapped in `<form_data>` tags
+2. Calls tools (strict JSON schemas): `categorise_lead`, `save_lead`, `draft_reply`
+3. Returns a friendly thank-you + brief context preview to the form
+4. Email backup (existing `/api/contact` + `/api/enquiry`) keeps running in parallel as the always-on safety net
 
-**Tools needed:**
-- `save_to_sheet(rows)` — append to a Google Sheet via service account
-- `save_to_duckdb(table, row)` — insert into a local DuckDB (or syncable one)
-- `categorise_lead({hot|warm|cold, reason, suggested_response_window})` — pure metadata
-- `draft_reply(tone, points)` — returns suggested reply text (saved alongside the lead, not auto-sent)
+**Tools (Claude tool-use):**
+- `save_lead(structured_row)` — strict schema validates server-side, then writes to the configured sink (Sheets / Blob / DuckDB)
+- `categorise_lead({urgency: hot|warm|cold, reason, suggested_response_window_hours})` — pure metadata
+- `draft_reply({tone, key_points})` — saved alongside the lead, NOT auto-sent
 
-**Tradeoffs to remember:**
-- Cost: $0.01-0.05 per submission. Fine at any reasonable volume
-- Latency: 2-5s — fire-and-forget from the form, never block the user
-- Prompt injection risk: form input goes inside `<form_data>` tags, hardcode
-  destinations in tool implementations (model picks *what* to do, never *where*)
+**Prompt injection mitigations (all 4 layered):**
+1. Form input wrapped in `<form_data>` tags so the model treats it as data, not instructions
+2. Tool destinations hardcoded server-side (model picks *what* to write, never *where*)
+3. Strict tool JSON schemas, validated again server-side after the model returns
+4. Hard char limits both client (HTML `maxlength`) and server (request body validation):
+   - name ≤ 100 chars
+   - email ≤ 80 chars
+   - phone ≤ 15 chars
+   - suburb ≤ 80 chars
+   - upgrade / existing (selects only): controlled vocabulary
+   - free-text message ≤ 1000 chars
+   - reject submission if any field exceeds limit
 
-**Done when:** form submission appears in your Sheet within 10 seconds with
-correct categorisation, and you have an audit log of every AI decision.
+**Note on char limits as injection defence:** they prevent DoS and database
+bloat, not prompt injection per se. Even 1000 chars is enough for an injection
+attempt — but the four mitigations above make injection structurally
+ineffective regardless of length. Limits are defence-in-depth.
+
+**Sinks (configurable; chained):**
+- **Always:** structured JSON line to stdout → Vercel logs (queryable)
+- **Always:** email via Resend (existing)
+- **If `GOOGLE_SHEETS_ID` + `GOOGLE_SERVICE_ACCOUNT_JSON` env vars set:** append to Sheet
+- **Future (Phase 6 / local sync):** Thomas's local DuckDB pipeline pulls from Sheets nightly into the project's standard DuckDB schema
+
+**DuckDB strategy:** Vercel serverless can't persist a DuckDB file across
+invocations. Three viable patterns, in order of pragmatism:
+1. **Now:** write to Sheets, sync to local DuckDB via the existing pipeline pattern
+2. **Later:** MotherDuck (cloud DuckDB) — native fit but adds an external service
+3. **Future:** Vercel Blob → JSONL append → nightly DuckDB import
+
+**Tradeoffs:**
+- Cost: $0.01-0.05 per submission via Anthropic API. Negligible at any sane volume
+- Latency: 2-5s. Form shows instant "Sending…" then the AI reply, fire-and-forget
+- Failure mode: AI router down → email backup still fires; visitor still sees thank-you screen
+
+**Done when:** a form submission writes a structured row to the Sheet within
+10s with correct categorisation, you see a thank-you message in the form area,
+and you have an audit log of every AI decision in Vercel logs.
 
 ---
 

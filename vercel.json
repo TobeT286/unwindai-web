@@ -3,7 +3,8 @@
   "functions": {
     "api/chat.js": { "maxDuration": 60, "includeFiles": "context/**" },
     "api/contact.js": { "maxDuration": 10 },
-    "api/enquiry.js": { "maxDuration": 10 }
+    "api/enquiry.js": { "maxDuration": 10 },
+    "api/intake.js": { "maxDuration": 30 }
   },
   "routes": [
     { "src": "/energy", "dest": "/energy.html" },

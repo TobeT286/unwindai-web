@@ -43,11 +43,11 @@
     <form class="hero-form" id="energy-quick-form">
       <h3 class="hero-form-title">Free Eligibility Check</h3>
       <p class="hero-form-sub">Or fill in your details and we'll come back to you within 24 hours.</p>
-      <input type="text" name="name" placeholder="Your name" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="tel" name="phone" placeholder="Phone (optional)">
-      <input type="text" name="suburb" placeholder="Suburb / postcode" required>
-      <textarea name="message" rows="3" placeholder="Briefly: what would you like upgraded?"></textarea>
+      <input type="text" name="name" placeholder="Your name" required maxlength="100">
+      <input type="email" name="email" placeholder="Email" required maxlength="80">
+      <input type="tel" name="phone" placeholder="Phone (optional)" maxlength="15">
+      <input type="text" name="suburb" placeholder="Suburb / postcode" required maxlength="80">
+      <textarea name="message" rows="3" placeholder="Briefly: what would you like upgraded?" maxlength="1000"></textarea>
       <button type="submit" class="hero-form-btn">Send My Enquiry</button>
       <p class="hero-form-status" id="hf-status"></p>
     </form>
@@ -221,21 +221,21 @@
       <div class="form-row">
         <div class="form-group">
           <label for="eq-name">Your name</label>
-          <input type="text" id="eq-name" name="name" placeholder="Jane Smith" required>
+          <input type="text" id="eq-name" name="name" placeholder="Jane Smith" required maxlength="100">
         </div>
         <div class="form-group">
           <label for="eq-phone">Phone number</label>
-          <input type="tel" id="eq-phone" name="phone" placeholder="+61 4XX XXX XXX" required>
+          <input type="tel" id="eq-phone" name="phone" placeholder="+61 4XX XXX XXX" required maxlength="15">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label for="eq-email">Email</label>
-          <input type="email" id="eq-email" name="email" placeholder="jane@example.com" required>
+          <input type="email" id="eq-email" name="email" placeholder="jane@example.com" required maxlength="80">
         </div>
         <div class="form-group">
           <label for="eq-suburb">Suburb / postcode</label>
-          <input type="text" id="eq-suburb" name="suburb" placeholder="Frankston 3199" required>
+          <input type="text" id="eq-suburb" name="suburb" placeholder="Frankston 3199" required maxlength="80">
         </div>
       </div>
       <div class="form-row">
@@ -266,7 +266,7 @@
       </div>
       <div class="form-group">
         <label for="eq-message">Any extra details (optional)</label>
-        <textarea id="eq-message" name="message" rows="3" placeholder="E.g. 4-bedroom home, 2 storeys, already have solar panels..."></textarea>
+        <textarea id="eq-message" name="message" rows="3" placeholder="E.g. 4-bedroom home, 2 storeys, already have solar panels..." maxlength="1000"></textarea>
       </div>
       <div class="form-group">
         <label for="eq-file">Attach floor plan or photo (optional — helps us size the system)</label>
@@ -348,27 +348,34 @@
     timer = setInterval(function() { go(current + 1); }, 6000);
   })();
 
-  // Hero quick-form submit → /api/enquiry
+  // Hero quick-form submit → /api/intake (AI router)
   document.getElementById('energy-quick-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    var btn = this.querySelector('.hero-form-btn');
+    var form = this;
+    var btn = form.querySelector('.hero-form-btn');
     var status = document.getElementById('hf-status');
     btn.disabled = true; btn.textContent = 'Sending…';
     status.style.color = ''; status.textContent = '';
-    var fd = new FormData(this);
+    var fd = new FormData(form);
     var payload = {
       name: fd.get('name'), email: fd.get('email'),
       phone: fd.get('phone'), suburb: fd.get('suburb'),
       message: fd.get('message'), source: 'energy hero quick form',
     };
     try {
-      var res = await fetch('/api/enquiry', {
+      var res = await fetch('/api/intake', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Server error ' + res.status);
-      status.textContent = "Thanks! We'll be in touch within 24 hours.";
-      btn.textContent = 'Sent ✓';
+      var data = await res.json().catch(function() { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || ('Server error ' + res.status));
+      // Replace form with thanks panel
+      form.innerHTML =
+        '<div class="hero-form-thanks">' +
+          '<div class="hero-form-tick">✓</div>' +
+          '<h3 class="hero-form-title">' + (data.thankYou || 'Thank you!') + '</h3>' +
+          (data.aiNote ? '<p class="hero-form-sub">' + data.aiNote + '</p>' : '') +
+        '</div>';
     } catch (err) {
       status.style.color = '#fca5a5';
       status.textContent = 'Something went wrong — please email info@unwindai.com.au directly.';
@@ -381,14 +388,15 @@
     document.getElementById('eq-file-label').textContent = this.files[0] ? '📎 ' + this.files[0].name : 'No file chosen';
   });
 
-  // Full enquiry form → /api/enquiry
+  // Full enquiry form → /api/intake (AI router)
   document.getElementById('energy-enquiry-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+    var form = this;
     var btn = document.getElementById('eq-submit');
     var status = document.getElementById('eq-status');
     btn.disabled = true; btn.textContent = 'Sending…';
     status.style.color = ''; status.textContent = '';
-    var fd = new FormData(this);
+    var fd = new FormData(form);
     var payload = {
       name: fd.get('name'), email: fd.get('email'),
       phone: fd.get('phone'), suburb: fd.get('suburb'),
@@ -396,14 +404,19 @@
       message: fd.get('message'), source: 'energy full enquiry form',
     };
     try {
-      var res = await fetch('/api/enquiry', {
+      var res = await fetch('/api/intake', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Server error ' + res.status);
-      status.style.color = '#16a34a';
-      status.textContent = "Thanks! We'll be in touch within 24 hours.";
-      btn.textContent = 'Sent ✓';
+      var data = await res.json().catch(function() { return {}; });
+      if (!res.ok || !data.ok) throw new Error(data.error || ('Server error ' + res.status));
+      // Replace form with thanks panel
+      form.innerHTML =
+        '<div class="enquiry-thanks">' +
+          '<div class="enquiry-thanks-tick">✓</div>' +
+          '<h3 class="enquiry-thanks-title">' + (data.thankYou || 'Thank you!') + '</h3>' +
+          (data.aiNote ? '<p class="enquiry-thanks-note">' + data.aiNote + '</p>' : '') +
+        '</div>';
     } catch (err) {
       status.style.color = '#dc2626';
       status.textContent = 'Something went wrong — please email info@unwindai.com.au directly.';

@@ -773,6 +773,32 @@ img { max-width: 100%; display: block; }
   color: #15803d; font-weight: 600; text-align: center;
 }
 
+/* ── Form thank-you panels (post-submit) ──────────────── */
+.contact-thanks,
+.hero-form-thanks,
+.enquiry-thanks {
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  padding: 1rem 0 0.5rem;
+}
+.contact-thanks-tick,
+.hero-form-tick,
+.enquiry-thanks-tick {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #16a34a; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+}
+.contact-thanks-note,
+.enquiry-thanks-note,
+.hero-form-thanks .hero-form-sub {
+  color: var(--c-muted); font-size: 0.92rem; line-height: 1.55;
+  max-width: 38rem; margin: 0;
+}
+.enquiry-thanks-title { font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--c-text); }
+.hero-form-thanks .hero-form-title { margin: 0; }
+
 /* ── Offers grid (energy page) ───────────────────────── */
 .offers-grid {
   display: grid;

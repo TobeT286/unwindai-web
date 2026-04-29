@@ -69,14 +69,32 @@ API endpoints likely needed under `/api/`:
 
 ---
 
+## Required Vercel env vars
+
+Set these in **Vercel → Project Settings → Environment Variables** (Production scope):
+
+| Var | Required? | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | yes | already set, drives `/api/chat` and now `/api/intake` |
+| `RESEND_API_KEY` | yes | email backup for every form (sign up free at resend.com) |
+| `ENQUIRY_EMAIL_TO` | optional | overrides default `info@unwindai.com.au` |
+| `CONTACT_EMAIL_FROM` | optional | once you verify a domain in Resend, e.g. `UnwindAI <enquiries@unwindai.com.au>` |
+| `GOOGLE_SHEETS_ID` | optional | enables Sheets sink — ID is the long string in the sheet URL |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | optional | full service-account JSON pasted as a single-line string. Share the sheet with the service account email |
+
+**Without `RESEND_API_KEY`:** forms still validate and AI router still runs, but no email is sent — visitor sees an error, fall back to direct mail.
+**Without `GOOGLE_*`:** Sheets sink silently skipped, log + email continue working.
+
+---
+
 ## Backlog — pick up after gadgets
 
-- Wire `/api/contact` endpoint (Resend or Google Sheets) — currently form is a placeholder
-- Wire energy enquiry form to the same endpoint
+- Phase 2 polish: split routes use `/api/contact` and `/api/enquiry` legacy endpoints; consider deprecating those once `/api/intake` is verified
 - Add Open Graph images per page
 - Replace temporary "Coming Soon" copy on /gadgets with real tool cards
 - Add Plausible / Umami analytics (lightweight, privacy-respecting)
 - Lighthouse pass: target ≥95 on Performance / Accessibility / SEO
+- Local DuckDB sync: scheduled Python script that pulls Sheets nightly into DuckDB
 
 ---
 
