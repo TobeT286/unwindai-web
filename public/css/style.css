@@ -133,12 +133,18 @@ img { max-width: 100%; display: block; }
   overflow-y: auto; overscroll-behavior: contain;
   margin-bottom: 0.75rem;
   display: flex; flex-direction: column; gap: 0.5rem;
-  justify-content: flex-end;
   scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.35) transparent;
 }
-.chat-messages::-webkit-scrollbar { width: 8px; }
-.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.35); border-radius: 4px; }
+.chat-messages::-webkit-scrollbar { width: 10px; }
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3); border-radius: 5px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+.chat-messages::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.5); background-clip: padding-box; }
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
+/* Flex-shrink fix so children don't push the container past max-height */
+.chat-messages > .chat-message { flex: 0 0 auto; }
 .chat-message {
   padding: 0.6rem 0.9rem; border-radius: 8px;
   font-size: 0.9rem; line-height: 1.55; max-width: 88%;
@@ -237,6 +243,9 @@ img { max-width: 100%; display: block; }
 .chat-widget--dark .chat-send-btn:not(:disabled):hover { background: #1e40af; }
 .chat-widget--dark .chat-attach-btn { color: #64748b; }
 .chat-widget--dark .chat-attach-btn:hover { color: #94a3b8; }
+.chat-widget--dark .chat-messages { scrollbar-color: rgba(255,255,255,0.4) transparent; }
+.chat-widget--dark .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); background-clip: padding-box; }
+.chat-widget--dark .chat-messages::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.6); background-clip: padding-box; }
 
 /* ── Hero split — chat + quick form side-by-side ──── */
 .hero-split {
