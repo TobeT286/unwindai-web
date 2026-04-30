@@ -89,17 +89,45 @@ Set these in **Vercel → Project Settings → Environment Variables** (Producti
 
 ## Backlog — pick up after gadgets
 
+**Near-term (after gadgets ship):**
 - Phase 2 polish: split routes use `/api/contact` and `/api/enquiry` legacy endpoints; consider deprecating those once `/api/intake` is verified
+- Add file-attachment support to `/api/intake` (energy full enquiry form has the input but file isn't uploaded yet — see Pattern B in session history; ~2 hour build)
 - Add Open Graph images per page
 - Replace temporary "Coming Soon" copy on /gadgets with real tool cards
 - Add Plausible / Umami analytics (lightweight, privacy-respecting)
 - Lighthouse pass: target ≥95 on Performance / Accessibility / SEO
+- Privacy policy linked from footer (mandatory before public 1.0 launch — Phase 2+ touches PII)
 - Local DuckDB sync: scheduled Python script that pulls Sheets nightly into DuckDB
+
+**Phase 3-4 (after homepage 1.0 ships):**
+- AI-drafted reply emails — `/admin/leads` page with magic-link auth; you review-and-send instead of typing each reply
+- AI books Calendly slot with personalised brief — low-compliance bridge before voice
+
+**Long-term — auto-calling agent (Phase 5, "Unwindai GoGreen voice agent")**
+- See `ROADMAP.md` Phase 5 for full architecture, compliance constraints, and pricing-accuracy guardrails
+- TL;DR: form submission with "OK to call" consent → Vapi.ai-managed agent calls within an hour, walks through VEU options with live VEEC pricing, books in-person assessment or politely opts out
+- Build cost: ~2 weeks MVP via Vapi (managed Twilio + STT + LLM + TTS); operational cost ~$0.50-$1.50 per 5-min call
+- Hard prerequisites: Phases 2-4 working, real-world transcripts to learn from, Australian compliance sorted (AI disclosure, recording disclosure, DNC, Privacy Act, NDS rules), pinned VEEC pricing table so the model never invents numbers
+- Quarter+ timeline — only worth building once close-rate × deal-size justifies the spend
+
+**Alternative email transport (optional swap):**
+- Currently: Resend API. Alternative: Gmail SMTP via App Password (`GMAIL_ADDRESS_UNWINDAI` + `GMAIL_APP_PASSWORD_UNWINDAI` env vars on Vercel + `nodemailer`). Resend is the recommended default — Gmail SMTP is here as a fallback if Resend doesn't suit. Never commit credentials; set them only in Vercel env
 
 ---
 
-## Notes for tomorrow's session
+## Notes for the next session
 
-- Start by saying: "Continue from WORKPLAN.md — run the functionality check first, then dispatch sub-agents for gadgets"
-- The green logo generator script lives at `make_green_logo.py` — re-run if the source logo changes
-- Worktree: `serene-hofstadter-09c764` (currently on branch `claude/serene-hofstadter-09c764`)
+**Recommended opening prompt (cold start, fresh window):**
+> *"Read ROADMAP.md and WORKPLAN.md, then start Stream B — dispatch the research agent for gadgets, then the three build agents in parallel."*
+
+**State of play as of last session (commit `a108bd0`):**
+- Homepage feature-complete, nearing 1.0 release
+- AI-routed `/api/intake` deployed; needs `RESEND_API_KEY` env var on Vercel to actually send mail
+- Three streams in flight: A (homepage 1.0 polish), B (gadgets build, parallel sub-agents), C (Phase 2 verification + DuckDB sync)
+- Voice/auto-calling agent **deferred to Phase 5** — see backlog above and `ROADMAP.md` Phase 5
+
+**Push policy (per memory):** direct pushes to main are pre-authorised for this repo. `data-pipeline` repos still require diff review.
+
+**Useful artefacts:**
+- `make_green_logo.py` — re-run if source logo changes
+- Worktree: `serene-hofstadter-09c764` on branch `claude/serene-hofstadter-09c764` (homepage edits land in main repo via absolute paths regardless)
