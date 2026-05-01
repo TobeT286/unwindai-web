@@ -86,14 +86,18 @@ async function recordProcessed(id, meta) {
 
 // ─── attachment fetch (re-uses readInbox would skip raw — fetch fresh) ─────
 
-async function fetchEmailsWithAttachments(account, days) {
+function imapClientFor(account) {
   const credSuffix = account === "private" ? "" : `_${account.toUpperCase()}`;
   const user = process.env[`GMAIL_ADDRESS${credSuffix}`];
   const pass = process.env[`GMAIL_APP_PASSWORD${credSuffix}`];
   if (!user || !pass) {
     throw new Error(`Missing IMAP creds for ${account} — set GMAIL_ADDRESS${credSuffix} and GMAIL_APP_PASSWORD${credSuffix}`);
   }
-  const client = new ImapFlow({ host: "imap.gmail.com", port: 993, secure: true, auth: { user, pass }, logger: false });
+  return new ImapFlow({ host: "imap.gmail.com", port: 993, secure: true, auth: { user, pass }, logger: false });
+}
+
+async function fetchEmailsWithAttachments(account, days) {
+  const client = imapClientFor(account);
   await client.connect();
   const messages = [];
   try {
@@ -103,7 +107,7 @@ async function fetchEmailsWithAttachments(account, days) {
       for await (const m of client.fetch({ since }, { source: true, envelope: true })) {
         const parsed = await simpleParser(m.source);
         messages.push({
-          id: parsed.messageId || `${m.uid}@${user}`,
+          id: parsed.messageId || `${m.uid}@${account}`,
           uid: m.uid,
           account,
           date: parsed.date,
@@ -121,6 +125,56 @@ async function fetchEmailsWithAttachments(account, days) {
     } finally { lock.release(); }
   } finally { await client.logout(); }
   return messages;
+}
+
+// Pulls In-Reply-To + References values from the Sent folder for the last
+// `days` days. The returned set is the universe of message-ids Thomas has
+// already replied to. Used to mark inbox emails as already_replied.
+async function fetchRepliedToIds(account, days) {
+  const replied = new Set();
+  const client = imapClientFor(account);
+  try {
+    await client.connect();
+    // Gmail's sent folder is "[Gmail]/Sent Mail" — try variants
+    const candidates = ["[Gmail]/Sent Mail", "Sent", "Gesendet", "INBOX.Sent"];
+    let opened = false;
+    let lock;
+    for (const name of candidates) {
+      try { lock = await client.getMailboxLock(name); opened = true; break; } catch { /* try next */ }
+    }
+    if (!opened) return replied;
+    try {
+      const since = new Date(Date.now() - days * 86_400_000);
+      for await (const m of client.fetch({ since }, { source: true })) {
+        const parsed = await simpleParser(m.source);
+        if (parsed.inReplyTo) replied.add(parsed.inReplyTo);
+        for (const ref of parsed.references || []) replied.add(ref);
+      }
+    } finally { lock.release(); }
+  } catch (err) {
+    console.warn(`  ⚠ ${account} sent-folder lookup failed: ${err.message}`);
+  } finally {
+    try { await client.logout(); } catch {}
+  }
+  return replied;
+}
+
+// Cross-account / forwarding dedup. Same from + subject + minute → keep first.
+function dedupAcrossAccounts(messages) {
+  const seen = new Map();
+  const kept = [];
+  for (const m of messages) {
+    const minuteBucket = m.date ? new Date(m.date).toISOString().slice(0, 16) : "no-date";
+    const key = `${m.from}|${m.subject}|${minuteBucket}`;
+    if (seen.has(key)) {
+      seen.get(key).duplicateAccounts.push(m.account);
+      continue;
+    }
+    m.duplicateAccounts = [];
+    seen.set(key, m);
+    kept.push(m);
+  }
+  return kept;
 }
 
 // ─── LLM categorisation ─────────────────────────────────────────────────────
@@ -147,11 +201,15 @@ const CATEGORISE_TOOL = {
       confidence: { type: "number", description: "0.0 to 1.0 — how confident the categorisation is. Below 0.75 routes to manual review." },
       reasoning: { type: "string", description: "One short sentence explaining the choice." },
       summary: { type: "string", description: "One-sentence summary of the email content." },
-      action_required: { type: "boolean" },
-      action_summary: { type: "string", description: "If action_required, what does Thomas need to do? Empty string otherwise." },
+      classification: {
+        type: "string",
+        enum: ["needs_reply", "needs_action", "informational", "noise"],
+        description: "needs_reply = sender is waiting on Thomas's response. needs_action = a non-reply task (do something, decide something). informational = read-and-know. noise = newsletter, marketing, automated notification with no action required.",
+      },
+      action_summary: { type: "string", description: "If needs_reply or needs_action, one-sentence description. Empty string otherwise." },
       priority: { type: "string", enum: ["high", "medium", "low"] },
     },
-    required: ["target_root", "target_subfolder", "confidence", "reasoning", "summary", "action_required", "priority"],
+    required: ["target_root", "target_subfolder", "confidence", "reasoning", "summary", "classification", "priority"],
   },
 };
 
@@ -173,6 +231,17 @@ Confidence rules:
 - 0.9+ when the routing is obvious from sender + subject
 - 0.75-0.9 when content makes it clear
 - below 0.75 if you're uncertain — better to route to uncategorised than misfile
+
+Classification rules (be strict — Thomas is drowning in noise):
+- "noise" = marketing, newsletters, automated notifications ("your statement is ready"), promotional offers, generic announcements with no action expected from Thomas. Most senders ending in @marketing, @newsletter, @notifications, @no-reply qualify. Set noise generously — Thomas will see the count and can spot-check.
+- "informational" = legit content worth knowing but no action: client updates, industry news he subscribed to, school notices, account confirmations.
+- "needs_action" = Thomas must do something other than reply: book an appointment, review a document, decide on a quote, follow a link.
+- "needs_reply" = sender is waiting on a response from Thomas. Be conservative — only mark this if a reply is genuinely expected (a real human asking a real question, not a CTA in marketing).
+
+Priority:
+- high = time-sensitive (today/tomorrow) or important client/financial/legal
+- medium = within the week
+- low = whenever convenient
 
 Email:
 - From: ${email.from}
@@ -250,43 +319,71 @@ function buildTeamsCard(stats, processed) {
   const now = new Date().toISOString().slice(0, 16).replace("T", " ");
   const total = processed.length;
   const errors = processed.filter((p) => p.error).length;
-  const themeColor = errors > 0 ? themeFail : (total === 0 ? themeNeutral : themePass);
 
-  const actions = processed
-    .filter((p) => p.decision?.action_required)
-    .sort((a, b) => ({ high: 0, medium: 1, low: 2 }[a.decision.priority] - { high: 0, medium: 1, low: 2 }[b.decision.priority]))
-    .map((p) => `- **[${p.decision.priority}]** ${p.decision.action_summary} _(from ${truncate(p.email.from, 40)})_`);
+  const successful = processed.filter((p) => p.decision);
+  const byClass = (cls) => successful.filter((p) => p.decision.classification === cls);
+  const needsReply       = byClass("needs_reply").filter((p) => !p.alreadyReplied);
+  const needsAction      = byClass("needs_action").filter((p) => !p.alreadyReplied);
+  const informational    = byClass("informational");
+  const noise            = byClass("noise");
+  const alreadyReplied   = successful.filter((p) => p.alreadyReplied);
+
+  const themeColor = errors > 0 ? themeFail : ((needsReply.length + needsAction.length) === 0 ? themePass : themeNeutral);
+
+  const sortPriority = (a, b) => ({ high: 0, medium: 1, low: 2 }[a.decision.priority] - { high: 0, medium: 1, low: 2 }[b.decision.priority]);
+
+  const fmtItem = (p) => `- **[${p.decision.priority}]** ${p.decision.action_summary || p.decision.summary} _(from ${truncate(p.email.from, 40)})_`;
 
   const autoRouted = processed.flatMap((p) =>
     (p.routed || []).filter((r) => !r.lowConfidence && !r.error).map((r) =>
       `- ${r.filename} → ${r.path.replace(ONEDRIVE_BASE + "\\", "")}`
     )
   );
-
   const uncategorisedAttachments = processed.flatMap((p) =>
     (p.routed || []).filter((r) => r.lowConfidence && !r.error).map((r) =>
-      `- ${r.filename} _(needs review — ${truncate(p.email.subject, 40)})_`
+      `- ${r.filename} _(${truncate(p.email.subject, 40)})_`
     )
   );
 
   const sections = [
     {
       activityTitle: `📧 Email Digest — ${now}`,
-      activitySubtitle: `${total} new emails across ${stats.accounts.join(" + ")} · ${actions.length} action items · ${autoRouted.length} attachments auto-routed · ${uncategorisedAttachments.length} need review${errors ? ` · ❌ ${errors} errors` : ""}`,
+      activitySubtitle: `${total} new · 🔴 ${needsReply.length} reply · 📌 ${needsAction.length} action · ✅ ${alreadyReplied.length} replied · 📰 ${informational.length} info · 🗑️ ${noise.length} noise · 📎 ${autoRouted.length} routed · ❓ ${uncategorisedAttachments.length} review${errors ? ` · ❌ ${errors} errors` : ""}`,
     },
   ];
 
-  if (actions.length) {
+  if (needsReply.length) {
     sections.push({
-      activityTitle: "📌 Action items",
-      text: actions.join("\n"),
+      activityTitle: "🔴 Needs your reply",
+      text: needsReply.sort(sortPriority).map(fmtItem).join("\n"),
+    });
+  }
+
+  if (needsAction.length) {
+    sections.push({
+      activityTitle: "📌 Action items (no reply)",
+      text: needsAction.sort(sortPriority).map(fmtItem).join("\n"),
+    });
+  }
+
+  if (alreadyReplied.length) {
+    sections.push({
+      activityTitle: "✅ Already replied — no action",
+      text: alreadyReplied.slice(0, 10).map((p) => `- ${truncate(p.email.subject, 60)} _(${truncate(p.email.from, 40)})_`).join("\n") + (alreadyReplied.length > 10 ? `\n_…and ${alreadyReplied.length - 10} more_` : ""),
+    });
+  }
+
+  if (informational.length) {
+    sections.push({
+      activityTitle: "📰 Worth knowing",
+      text: informational.slice(0, 8).map((p) => `- ${p.decision.summary} _(${truncate(p.email.from, 40)})_`).join("\n") + (informational.length > 8 ? `\n_…and ${informational.length - 8} more_` : ""),
     });
   }
 
   if (autoRouted.length) {
     sections.push({
-      activityTitle: "📎 Auto-routed attachments",
-      text: autoRouted.slice(0, 30).join("\n") + (autoRouted.length > 30 ? `\n_…and ${autoRouted.length - 30} more_` : ""),
+      activityTitle: "📎 Attachments auto-routed",
+      text: autoRouted.slice(0, 20).join("\n") + (autoRouted.length > 20 ? `\n_…and ${autoRouted.length - 20} more_` : ""),
     });
   }
 
@@ -294,7 +391,17 @@ function buildTeamsCard(stats, processed) {
     sections.push({
       activityTitle: "❓ Attachments needing review",
       activitySubtitle: `Saved to ${UNCATEGORISED.replace(ONEDRIVE_BASE + "\\", "")}\\<date>\\`,
-      text: uncategorisedAttachments.slice(0, 30).join("\n") + (uncategorisedAttachments.length > 30 ? `\n_…and ${uncategorisedAttachments.length - 30} more_` : ""),
+      text: uncategorisedAttachments.slice(0, 20).join("\n") + (uncategorisedAttachments.length > 20 ? `\n_…and ${uncategorisedAttachments.length - 20} more_` : ""),
+    });
+  }
+
+  if (noise.length) {
+    const topSenders = Object.entries(
+      noise.reduce((acc, p) => { const sender = p.email.from.split("<")[0].trim().slice(0, 40); acc[sender] = (acc[sender] || 0) + 1; return acc; }, {})
+    ).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    sections.push({
+      activityTitle: `🗑️ Noise filtered (${noise.length})`,
+      text: topSenders.map(([s, n]) => `- ${s} ×${n}`).join("\n"),
     });
   }
 
@@ -321,42 +428,65 @@ async function run() {
   console.log(`  Folders scanned: ${businessFolders.length} business, ${personalFolders.length} personal`);
 
   const processedIds = await loadProcessedIds();
-  const stats = { accounts: [], totalRead: 0, totalNew: 0 };
+  const stats = { accounts: [], totalRead: 0, totalNew: 0, deduped: 0 };
   const processed = [];
 
-  for (const account of ["private", "unwindai"]) {
-    let messages;
-    try {
-      messages = await fetchEmailsWithAttachments(account, DAYS_BACK);
-      stats.accounts.push(account);
-      stats.totalRead += messages.length;
-    } catch (err) {
-      console.warn(`  ⚠ ${account} fetch failed: ${err.message}`);
-      continue;
-    }
-    console.log(`  ${account}: ${messages.length} message(s) in last ${DAYS_BACK} day(s)`);
-
-    for (const email of messages) {
-      if (processedIds.has(email.id)) continue;
-      stats.totalNew++;
+  // Pull inbox + sent for both accounts in parallel where possible
+  const accountsData = await Promise.all(
+    ["private", "unwindai"].map(async (account) => {
       try {
-        const decision = await categorise(email, businessFolders, personalFolders);
-        const routed = email.attachments.length ? await routeAttachments(email, decision) : [];
-        processed.push({ email, decision, routed });
-        await recordProcessed(email.id, {
-          account,
-          subject: email.subject?.slice(0, 100),
-          target: decision.target_root === "uncategorised"
-            ? "uncategorised"
-            : `${decision.target_root}/${decision.target_subfolder}`,
-          confidence: decision.confidence,
-          attachments: routed.length,
-        });
-        console.log(`  ✓ [${decision.target_root}/${decision.target_subfolder}] ${truncate(email.subject, 50)} (conf ${decision.confidence.toFixed(2)})`);
+        const [messages, repliedTo] = await Promise.all([
+          fetchEmailsWithAttachments(account, DAYS_BACK),
+          fetchRepliedToIds(account, DAYS_BACK + 14), // wider window for sent — replies often happen days later
+        ]);
+        return { account, messages, repliedTo };
       } catch (err) {
-        console.warn(`  ✗ ${truncate(email.subject, 50)}: ${err.message}`);
-        processed.push({ email, error: err.message });
+        console.warn(`  ⚠ ${account} fetch failed: ${err.message}`);
+        return { account, messages: [], repliedTo: new Set() };
       }
+    })
+  );
+
+  // Merge sent-folder universes — a reply from either account counts as "replied"
+  const allRepliedTo = new Set();
+  for (const { repliedTo } of accountsData) for (const id of repliedTo) allRepliedTo.add(id);
+
+  // Combine + dedup messages across accounts
+  let allMessages = [];
+  for (const { account, messages } of accountsData) {
+    if (messages.length) stats.accounts.push(account);
+    stats.totalRead += messages.length;
+    allMessages = allMessages.concat(messages);
+  }
+  const beforeDedup = allMessages.length;
+  allMessages = dedupAcrossAccounts(allMessages);
+  stats.deduped = beforeDedup - allMessages.length;
+  console.log(`  Inbox: ${stats.totalRead} total, ${stats.deduped} cross-account duplicates removed`);
+  console.log(`  Sent (last ${DAYS_BACK + 14} days): ${allRepliedTo.size} message-ids referenced`);
+
+  for (const email of allMessages) {
+    if (processedIds.has(email.id)) continue;
+    stats.totalNew++;
+    const alreadyReplied = email.id && allRepliedTo.has(email.id);
+    try {
+      const decision = await categorise(email, businessFolders, personalFolders);
+      const routed = email.attachments.length ? await routeAttachments(email, decision) : [];
+      processed.push({ email, decision, routed, alreadyReplied });
+      await recordProcessed(email.id, {
+        account: email.account,
+        subject: email.subject?.slice(0, 100),
+        target: decision.target_root === "uncategorised" ? "uncategorised" : `${decision.target_root}/${decision.target_subfolder}`,
+        classification: decision.classification,
+        alreadyReplied,
+        confidence: decision.confidence,
+        attachments: routed.length,
+      });
+      const repliedTag = alreadyReplied ? " [replied]" : "";
+      const dupeTag = email.duplicateAccounts?.length ? ` [+${email.duplicateAccounts.join(",")}]` : "";
+      console.log(`  ✓ [${decision.classification}|${decision.target_root}/${decision.target_subfolder}]${repliedTag}${dupeTag} ${truncate(email.subject, 50)} (conf ${decision.confidence.toFixed(2)})`);
+    } catch (err) {
+      console.warn(`  ✗ ${truncate(email.subject, 50)}: ${err.message}`);
+      processed.push({ email, error: err.message, alreadyReplied });
     }
   }
 
@@ -367,7 +497,7 @@ async function run() {
   } catch (err) {
     console.error("[email-flow] Teams send failed:", err.message);
   }
-  console.log(`[email-flow] Done — ${stats.totalNew} new email(s) processed.`);
+  console.log(`[email-flow] Done — ${stats.totalNew} new email(s) processed (${stats.deduped} dedup'd).`);
 }
 
 run().catch((err) => {
