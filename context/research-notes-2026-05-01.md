@@ -2,6 +2,35 @@
 
 _One-off video analyses requested by Thomas. Auto-saved by ad-hoc research run; not part of the nightly youtube-researcher digest._
 
+## Karpathy interview — Software 3.0 / agentic engineering / why apps shouldn't exist
+**URL:** https://youtube.com/watch?v=96jN2OCOfLs&t=916s
+
+**One sentence:** Karpathy argues we've crossed a threshold into a genuinely new computing paradigm — Software 3.0 — where prompting replaces programming, agents replace apps, and the critical skill is knowing how to direct and verify jagged, powerful AI systems rather than write code yourself.
+
+### Substantive ideas
+
+- **The December inflection point was real and underappreciated.** *"A lot of people experienced AI last year as a ChatGPT-adjacent thing. But you really had to look again as of December, because things changed fundamentally"* — specifically on agentic, coherent workflows that actually started working.
+
+- **Software 3.0 means prompts are the new programs.** S1.0 = explicit code; S2.0 = training data and weights; S3.0 = *"your programming now turns to prompting, and what's in the context window is your lever over the interpreter that is the LLM."* The OpenClaw installer — a block of text you paste to your agent — is the paradigm in miniature.
+
+- **Most existing apps shouldn't exist.** His MenuGen app (photo → OCR → image generation pipeline) was made obsolete by simply handing the photo to Gemini with a one-line prompt. *"All of my MenuGen is spurious. It's working in the old paradigm. That app shouldn't exist."* The question isn't how to speed up what exists — it's what's newly possible that couldn't exist before.
+
+- **Verifiability explains the jaggedness.** Models peak in domains where outputs can be verified (math, code) because that's what RL reward signals target. *"If you're in the circuits that were part of the RL, you fly. If you're out of the data distribution, you're going to struggle."* The car-wash example: a model that can refactor 100k-line codebases still tells you to walk to the car wash.
+
+- **Vibe coding ≠ agentic engineering.** *"Vibe coding is about raising the floor for everyone. Agentic engineering is about preserving the quality bar of what existed before in professional software."* The latter is a real discipline: coordinating stochastic, powerful agents to go faster without introducing vulnerabilities or losing design integrity.
+
+- **You remain responsible for taste, spec, and judgment — for now.** Agents are "intern entities." They'll match Stripe emails to Google accounts by email address (wrong). Humans must own the spec, the architecture decisions, the unique IDs. *"You're doing the design and development; the agents are doing fill-in-the-blanks."* API details are delegated; mental models of what's actually happening underneath are not.
+
+- **Ghosts, not animals.** LLMs aren't evolved intelligences with intrinsic motivation. Yelling at them changes nothing. They're *"statistical simulation circuits"* with RL bolted on top — useful framing for calibrating when to trust them and what to expect.
+
+### Takeaways for Unwind AI's positioning
+
+1. **Stop building middleware apps; sell agent-native workflows instead.** If the deliverable is a multi-step pipeline stitching APIs (ingest → transform → display), ask whether a well-prompted frontier model collapses that entire stack. Value-add to SMB clients = identifying which processes are pipeline-replaceable vs. which genuinely need orchestration — and building the latter, not the former.
+2. **Find the client's verifiable domain and build there first.** Verifiability is a project-selection filter: if the output of an AI task can be checked (a report matches source data, a generated invoice is correct, a categorisation can be audited), reliable improvable systems are buildable. Pitch SMB clients on automating their most *checkable* back-office work first.
+3. **Make everything agent-legible, not human-legible.** Karpathy's pet peeve — docs written for humans, not agents — is a product design opportunity. Structure outputs, SOPs, and onboarding so an agent can act on them directly (machine-readable schemas, paste-to-agent instructions, not PDFs). Compounds across every future agent the client adopts.
+
+---
+
 ## AI mit Arnie — context generation video
 **URL:** https://youtube.com/watch?v=i4u_sLwTlYw
 **Title:** Ich hab eine KI gebaut, die alles kann
