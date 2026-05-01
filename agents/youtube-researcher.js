@@ -35,12 +35,30 @@ const MAX_TRANSCRIPT_CHARS = 8_000;
 // or `channelId` (UC…). Use channelId when the @handle has been claimed by a
 // different channel — e.g. the real Teacher's Tech doesn't own @TeachersTech.
 const TARGET_CHANNELS = [
+  // Official labs — primary-source product news, releases, demos
+  { handle: "AnthropicAI",                  label: "Anthropic" },
+  { handle: "OpenAI",                       label: "OpenAI" },
+  // Independent thinkers worth tracking directly
+  { handle: "AndrejKarpathy",               label: "Andrej Karpathy" },
+  // Engineering / conference talks
+  { channelId: "UCLKPca3kwwd-B59HNr-_lvA",  label: "AI Engineer" },
+  // Practitioners and tutorials
   { handle: "IBMTechnology",                label: "IBM Technology" },
   { handle: "nateherk",                     label: "Nate Herk" },
   { handle: "AIFoundersHQ",                 label: "AI Founders" },
   { handle: "DieAIStube",                   label: "Die AI Stube" },
   { channelId: "UCO66zvpQorlNfs_7hFCfmaw",  label: "Teacher's Tech" },
+  // Investing / personal finance — seeds for the future bank/investment agent
+  { channelId: "UCORX3Cl7ByidjEgzSCgv9Yw",  label: "Ticker Symbol: YOU" },
   // Thomas — append more entries here. Prefer channelId if you already have it.
+];
+
+// Search-based sources — pulls recent videos matching a query across every
+// channel. Useful for capturing interviews with specific people who appear
+// on many hosts (e.g. Karpathy on Lex Fridman, Dwarkesh, No Priors, etc.).
+// Filtered to "this month" via YouTube search sp parameter.
+const TARGET_SEARCHES = [
+  { query: "Karpathy interview", label: "Karpathy interviews & talks" },
 ];
 
 // ─── channel ID resolution (HTML scrape, cached) ────────────────────────────
@@ -94,6 +112,49 @@ async function fetchChannelRss(channelId) {
 function withinWindow(publishedIso, days) {
   const cutoff = Date.now() - days * 86_400_000;
   return new Date(publishedIso).getTime() >= cutoff;
+}
+
+// ─── search-based source (no API) ───────────────────────────────────────────
+// Scrapes YouTube's search results page, filtered to "this month" via sp param,
+// and resolves each result via oEmbed to get title + channel name. Skips date
+// filtering (the search-page filter handles it). YouTube does not publish a
+// search RSS feed, so this is a best-effort scrape — fragile but cheap.
+
+async function fetchSearchVideos(query, maxResults = 5) {
+  const sp = "EgIIBA%253D%253D"; // YouTube filter: "this month"
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${sp}`;
+  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  if (!res.ok) throw new Error(`search ${url} returned ${res.status}`);
+  const html = await res.text();
+
+  const ids = [];
+  const seen = new Set();
+  for (const m of html.matchAll(/"videoId":"([\w-]{11})"/g)) {
+    if (!seen.has(m[1])) {
+      seen.add(m[1]);
+      ids.push(m[1]);
+      if (ids.length >= maxResults * 3) break;
+    }
+  }
+
+  const videos = [];
+  for (const id of ids) {
+    try {
+      const oembed = await fetch(`https://www.youtube.com/oembed?url=https://youtube.com/watch?v=${id}&format=json`);
+      if (!oembed.ok) continue;
+      const meta = await oembed.json();
+      videos.push({
+        videoId: id,
+        title: meta.title,
+        channel: meta.author_name,
+        // oEmbed doesn't return upload date — search filter already restricts to this month
+        published: new Date().toISOString(),
+        url: `https://youtube.com/watch?v=${id}`,
+      });
+      if (videos.length >= maxResults) break;
+    } catch { /* skip and continue */ }
+  }
+  return videos;
 }
 
 // ─── transcript + summary ───────────────────────────────────────────────────
@@ -165,6 +226,23 @@ async function run() {
     }
   }
 
+  // Search-based sources — captures interviews / mentions across hosts.
+  for (const { query, label } of TARGET_SEARCHES) {
+    try {
+      console.log(`  Searching: ${label} ("${query}")`);
+      const videos = await fetchSearchVideos(query, MAX_VIDEOS_PER_CHANNEL);
+      console.log(`  Found ${videos.length} matching video(s) (this month)`);
+      for (const video of videos) {
+        const transcript = await getTranscript(video.videoId);
+        const summary = await summariseVideo(video, transcript);
+        allSummaries.push(summary);
+        console.log(`  ✓ ${summary.title.slice(0, 60)}…`);
+      }
+    } catch (err) {
+      console.warn(`  ⚠ search "${query}" failed: ${err.message}`);
+    }
+  }
+
   await saveChannelIdCache(cache);
 
   if (!allSummaries.length) {
@@ -175,7 +253,7 @@ async function run() {
   const date = new Date().toISOString().slice(0, 10);
   const lines = [
     `# AI Research — YouTube Digest`,
-    `_Last updated: ${date} | Sources: ${TARGET_CHANNELS.map((c) => c.label).join(", ")} | Window: last ${DAYS_BACK} days_`,
+    `_Last updated: ${date} | Channels: ${TARGET_CHANNELS.map((c) => c.label).join(", ")} | Searches: ${TARGET_SEARCHES.map((s) => s.label).join(", ") || "none"} | Window: last ${DAYS_BACK} days_`,
     "",
   ];
 
