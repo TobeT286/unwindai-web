@@ -213,8 +213,12 @@ const CATEGORISE_TOOL = {
   },
 };
 
-async function categorise(email, businessFolders, personalFolders) {
+async function categorise(email, businessFolders, personalFolders, routingKnowledge) {
   const prompt = `You are categorising a single email for Thomas Taresch's filing system.
+
+${routingKnowledge}
+
+---
 
 Available folders under \`Documents/UnwyndAI\` (business):
 ${businessFolders.map((f) => `- ${f}`).join("\n")}
@@ -222,15 +226,7 @@ ${businessFolders.map((f) => `- ${f}`).join("\n")}
 Available folders under \`Documents/personal\`:
 ${personalFolders.map((f) => `- ${f}`).join("\n")}
 
-Routing rules:
-- "UnwyndAI" = business / clients / Unwind AI work / energy upgrades / VEU / consulting / income / invoicing of clients
-- "personal" = anything to do with personal life: bank, properties (Thomas owns several investment properties), SMSF, tax, immigration, certificates
-- "uncategorised" = genuinely unclear; pick this if you'd be guessing
-
-Confidence rules:
-- 0.9+ when the routing is obvious from sender + subject
-- 0.75-0.9 when content makes it clear
-- below 0.75 if you're uncertain — better to route to uncategorised than misfile
+When the routing knowledge above conflicts with the bare folder list, the knowledge wins — it tells you canonical vs deprecated folders.
 
 Classification rules (be strict — Thomas is drowning in noise):
 - "noise" = marketing, newsletters, automated notifications ("your statement is ready"), promotional offers, generic announcements with no action expected from Thomas. Most senders ending in @marketing, @newsletter, @notifications, @no-reply qualify. Set noise generously — Thomas will see the count and can spot-check.
@@ -425,7 +421,8 @@ async function run() {
   console.log("[email-flow] Starting…");
   const businessFolders = await scanFolders(BUSINESS_ROOT);
   const personalFolders = await scanFolders(PERSONAL_ROOT);
-  console.log(`  Folders scanned: ${businessFolders.length} business, ${personalFolders.length} personal`);
+  const routingKnowledge = await readFile(join(__dirname, "..", "routing-knowledge.md"), "utf-8");
+  console.log(`  Folders scanned: ${businessFolders.length} business, ${personalFolders.length} personal · routing knowledge: ${routingKnowledge.length} chars`);
 
   const processedIds = await loadProcessedIds();
   const stats = { accounts: [], totalRead: 0, totalNew: 0, deduped: 0 };
@@ -469,7 +466,7 @@ async function run() {
     stats.totalNew++;
     const alreadyReplied = email.id && allRepliedTo.has(email.id);
     try {
-      const decision = await categorise(email, businessFolders, personalFolders);
+      const decision = await categorise(email, businessFolders, personalFolders, routingKnowledge);
       const routed = email.attachments.length ? await routeAttachments(email, decision) : [];
       processed.push({ email, decision, routed, alreadyReplied });
       await recordProcessed(email.id, {

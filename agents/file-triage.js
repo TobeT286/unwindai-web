@@ -8,7 +8,7 @@
 // Default path: C:\Users\<you>\Downloads
 // Default max:  50
 
-import { readdir, stat, writeFile } from "fs/promises";
+import { readdir, stat, writeFile, readFile } from "fs/promises";
 import { join, dirname, extname } from "path";
 import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
@@ -63,8 +63,12 @@ const ROUTE_FILE_TOOL = {
   },
 };
 
-async function classifyFile(file, businessFolders, personalFolders) {
+async function classifyFile(file, businessFolders, personalFolders, routingKnowledge) {
   const prompt = `You are categorising a file in Thomas Taresch's Downloads folder.
+
+${routingKnowledge}
+
+---
 
 Available folders under \`Documents/UnwyndAI\` (business):
 ${businessFolders.map((f) => `- ${f}`).join("\n")}
@@ -72,17 +76,9 @@ ${businessFolders.map((f) => `- ${f}`).join("\n")}
 Available folders under \`Documents/personal\`:
 ${personalFolders.map((f) => `- ${f}`).join("\n")}
 
-Routing rules:
-- "UnwyndAI" = business / clients / Unwind AI work / VEU / consulting / income / training / marketing
-- "personal" = bank, properties (Thomas owns several investment properties), SMSF, tax, immigration, certificates, family
-- "uncategorised" = unclear from the filename alone — you'd be guessing
+When routing knowledge above conflicts with the bare folder list, the routing knowledge wins (it tells you which folders are canonical and which are deprecated).
 
-Confidence:
-- 0.9+ when the filename is unambiguous (e.g. "CommBank_Statement_April2026.pdf")
-- 0.75-0.9 when the filename + extension strongly suggest a category
-- below 0.75 when you're guessing — better to mark uncategorised
-
-File:
+File to categorise:
 - Name: ${file.name}
 - Extension: ${file.ext || "(none)"}
 - Size: ${file.size} bytes
@@ -105,6 +101,7 @@ async function run() {
 
   const businessFolders = await scanFolders(BUSINESS_ROOT);
   const personalFolders = await scanFolders(PERSONAL_ROOT);
+  const routingKnowledge = await readFile(join(__dirname, "routing-knowledge.md"), "utf-8");
 
   const all = await readdir(TARGET_DIR, { withFileTypes: true }).catch(() => []);
   const files = [];
@@ -112,7 +109,7 @@ async function run() {
     if (!e.isFile()) continue;
     if (e.name.startsWith(".")) continue;
     if (e.name.startsWith("~$")) continue;       // Office lock files
-    if (/\.(exe|msi|dmg|tmp|crdownload|part)$/i.test(e.name)) continue; // installers / partial downloads
+    if (/\.(exe|msi|dmg|iso|winmd|tmp|crdownload|part)$/i.test(e.name)) continue; // installers / partial downloads / system metadata
     const fp = join(TARGET_DIR, e.name);
     const s = await stat(fp);
     files.push({ name: e.name, path: fp, size: s.size, mtime: s.mtime, ext: extname(e.name).toLowerCase() });
@@ -124,7 +121,7 @@ async function run() {
   const decisions = [];
   for (const f of sample) {
     try {
-      const decision = await classifyFile(f, businessFolders, personalFolders);
+      const decision = await classifyFile(f, businessFolders, personalFolders, routingKnowledge);
       decisions.push({ file: f, decision });
       const tgt = decision.target_root === "uncategorised" ? "uncategorised" : `${decision.target_root}/${decision.target_subfolder}`;
       console.log(`  ${f.name.slice(0, 60).padEnd(60)} → ${tgt} (${decision.confidence.toFixed(2)})`);
